@@ -3,8 +3,9 @@
     "day": "Понедельник",
     "lessons": [
       {
-        "lesson": "Матан",
-        "time_start": 8.0,
+        "lesson": "Математика",
+        "time_start": "8:00",
+        "time_finish": "8:40",
         "task": "Домашнее задание"
       }
     ]

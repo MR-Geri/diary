@@ -39,8 +39,7 @@ class Diary:
             ]
         #
         now = datetime.datetime.weekday(datetime.datetime.now())
-        now = 0 if now == 5 or now == 6 else now
-        self.draw_data = self.file[now:] + self.file[:now]
+        self.day = 0 if now == 5 or now == 6 else now
         #
         self.last_click = 0
         self.text_keyboard = ''
@@ -97,14 +96,13 @@ class Diary:
                 ["<", (981 // divider, 1880 // divider, 98 // divider, 180 // divider)]
             ],
             [
-                [".", (98 // divider, 2060 // divider, 98 // divider, 180 // divider),
-                 (-98 // divider // 15, -180 // divider // 3)],
+                [".", (98 // divider, 2060 // divider, 98 // divider, 180 // divider)],
                 [' ', (196 // divider, 2060 // divider, 98 // divider * 7, 180 // divider)],
                 ["#", (883 // divider, 2060 // divider, 98 // divider, 180 // divider)]
             ]
         ]
         self.height_block_keys = height // 2 - 220
-        self.card_flag = False
+        self.card_flag = True
 
     def keyboards_action(self, pos, click):
         for y in self.keys:
@@ -135,18 +133,31 @@ class Diary:
         for y in self.keys:
             for x in y:
                 pygame.draw.rect(display, (60, 63, 65), x[1])
-                if len(x) == 2:
-                    text_print(message=x[0], x=x[1][0], y=x[1][1], font_size=170 // divider)
-                else:
-                    text_print(message=x[0], x=x[1][0] + x[2][0], y=x[1][1] + x[2][1], font_size=170 // divider)
+                text_print(message=x[0], x=x[1][0], y=x[1][1], font_size=170 // divider)
 
     def card_draw(self):
-        pass
+        lessons = self.file[self.day]['lessons']
+        date = datetime.date.today()
+        date += datetime.timedelta(days=self.day)
+        text_print(message=f'{self.file[self.day]["day"]} {date}', x=30, y=20, font_color=(255, 255, 255))
+        for i in range(len(lessons)):
+            x = 20 // divider
+            y_size = ((height - self.height_block_keys - 40 // divider - 15) // 8)
+            y = 60 + y_size * i
+            pygame.draw.rect(display, (60, 63, 65), (
+                x,
+                y,
+                width - 40 // divider,
+                y_size - 10
+            ))
+            text_print(
+                message=f'{lessons[i].get("time_start")}-{lessons[i].get("time_finish")}',
+                x=x + 10, y=y + 10, font_size=30)
 
     def draw_all(self):
         pygame.draw.rect(display, (43, 43, 43), (0, 0, width, height))
         main.keyboards_draw()
-        text_print(message=self.text_keyboard, x=0, y=200, font_size=50)
+        # text_print(message=self.text_keyboard, x=0, y=200, font_size=50)
         if self.card_flag:
             main.card_draw()
         pygame.display.update()
@@ -157,7 +168,8 @@ class Diary:
             for les in range(int(input('Количество предметов: '))):
                 self.file[index]['lessons'].append(
                     {"lesson": input('\tНазвание предмета: '),
-                     "time_start": float(input('\tНачало урока: ')),
+                     "time_start": input('\tНачало урока: '),
+                     "time_finish": input('\tКонец урока: '),
                      "task": "Домашнее задание"}
                 )
         for day in self.file:
