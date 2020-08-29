@@ -1,5 +1,3 @@
-from threading import Thread
-
 import pygame
 import json
 import datetime
@@ -46,7 +44,7 @@ class Diary:
         #
         self.last_click = 0
         self.text_keyboard = ''
-        self.key = [
+        self.keys = [
             [
                 ["1", (0 // divider, 1340 // divider, 108 // divider, 180 // divider)],
                 ["2", (108 // divider, 1340 // divider, 108 // divider, 180 // divider)],
@@ -105,37 +103,53 @@ class Diary:
                 ["#", (883 // divider, 2060 // divider, 98 // divider, 180 // divider)]
             ]
         ]
-        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', '']
-        self.h_keys = height // 2 - 220
-        self.keyboards_flag = False
+        self.height_block_keys = height // 2 - 220
+        self.card_flag = False
+
+    def keyboards_action(self, pos, click):
+        for y in self.keys:
+            for x in y:
+                if x[1][0] < pos[0] < x[1][0] + x[1][2] and x[1][1] < pos[1] < x[1][1] + x[1][3] \
+                        and click == 1 and self.last_click == 0:
+                    if x[0] == '<':
+                        self.text_keyboard = self.text_keyboard[:-1]
+                    elif x[0] == '#':
+                        self.text_keyboard += '\n'
+                    else:
+                        self.text_keyboard += x[0]
+                    main.draw_all()
+
+    def card_action(self, pos, click):
+        pass
 
     def action(self):
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
-        if self.keyboards_flag:
-            for y in self.key:
-                for x in y:
-                    if x[1][0] < pos[0] < x[1][0] + x[1][2] and x[1][1] < pos[1] < x[1][1] + x[1][3] \
-                            and click == 1 and self.last_click == 0:
-                        if x[0] == '<':
-                            self.text_keyboard = self.text_keyboard[:-1]
-                        elif x[0] == '#':
-                            self.text_keyboard += '\n'
-                        else:
-                            self.text_keyboard += x[0]
-        if self.last_click == 0 and click == 1 and 0 < pos[1] < (height - self.h_keys):
-            self.keyboards_flag = not self.keyboards_flag
+        main.keyboards_action(pos, click)
+        if self.card_flag:
+            main.card_action(pos, click)
         self.last_click = 0 if click == 0 else 1
 
     def keyboards_draw(self):
-        pygame.draw.rect(display, (60, 63, 65), (0, (height - self.h_keys), width, height))
-        for y in self.key:
+        pygame.draw.rect(display, (60, 63, 65), (0, (height - self.height_block_keys), width, height))
+        for y in self.keys:
             for x in y:
                 pygame.draw.rect(display, (60, 63, 65), x[1])
                 if len(x) == 2:
                     text_print(message=x[0], x=x[1][0], y=x[1][1], font_size=170 // divider)
                 else:
                     text_print(message=x[0], x=x[1][0] + x[2][0], y=x[1][1] + x[2][1], font_size=170 // divider)
+
+    def card_draw(self):
+        pass
+
+    def draw_all(self):
+        pygame.draw.rect(display, (43, 43, 43), (0, 0, width, height))
+        main.keyboards_draw()
+        text_print(message=self.text_keyboard, x=0, y=200, font_size=50)
+        if self.card_flag:
+            main.card_draw()
+        pygame.display.update()
 
     def add_lesson(self):
         for index in [int(num) for num in input('День недели(0-4) через пробел: ').split()]:
@@ -158,18 +172,11 @@ class Diary:
         except:
             print("ERROR save_json_data")
 
-    def draw_all(self):
-        pygame.draw.rect(display, (43, 43, 43), (0, 0, width, height))
-        text_print(message=self.text_keyboard, x=0, y=200, font_size=50)
-        if self.keyboards_flag:
-            main.keyboards_draw()
-        pygame.display.update()
-
     def run(self):
         """ Запуск приложения """
+        main.draw_all()
         while True:
             main.action()
-            main.draw_all()
             for en in pygame.event.get():
                 if en.type == pygame.QUIT:
                     pygame.quit()
@@ -178,7 +185,7 @@ class Diary:
 
 if __name__ == '__main__':
     # Инициализация
-    divider = 2
+    divider = 1
     width = 1080 // divider
     height = 2240 // divider
     pygame.init()
