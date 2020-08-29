@@ -1,5 +1,4 @@
-import random
-import time
+from threading import Thread
 
 import pygame
 import json
@@ -100,7 +99,10 @@ class Diary:
                 ["<", (981 // divider, 1880 // divider, 98 // divider, 180 // divider)]
             ],
             [
-
+                [".", (98 // divider, 2060 // divider, 98 // divider, 180 // divider),
+                 (-98 // divider // 15, -180 // divider // 3)],
+                [' ', (196 // divider, 2060 // divider, 98 // divider * 7, 180 // divider)],
+                ["#", (883 // divider, 2060 // divider, 98 // divider, 180 // divider)]
             ]
         ]
         self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', '']
@@ -111,51 +113,29 @@ class Diary:
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
         if self.keyboards_flag:
-            for y in range(len(self.keys)):
-                for x in range(len(self.keys[y])):
-                    _x = x * width // len(self.keys[y])
-                    _y = (height - self.h_keys) + y * self.h_keys // len(self.keys)
-                    if _x < pos[0] < _x + width // len(self.keys[y]) and _y < pos[1] < _y + self.h_keys // len(
-                            self.keys) \
+            for y in self.key:
+                for x in y:
+                    if x[1][0] < pos[0] < x[1][0] + x[1][2] and x[1][1] < pos[1] < x[1][1] + x[1][3] \
                             and click == 1 and self.last_click == 0:
-                        if self.keys[y][x] == '<':
+                        if x[0] == '<':
                             self.text_keyboard = self.text_keyboard[:-1]
+                        elif x[0] == '#':
+                            self.text_keyboard += '\n'
                         else:
-                            self.text_keyboard += self.keys[y][x]
-            for x in [[0, '.'], [10 * width // 11, '\n']]:
-                _y = (height - self.h_keys) + 4 * self.h_keys // len(self.keys)
-                if x[0] < pos[0] < x[0] + width // 11 and _y < pos[1] < _y + self.h_keys // len(self.keys) \
-                        and click == 1 and self.last_click == 0:
-                    self.text_keyboard += x[1]
-
+                            self.text_keyboard += x[0]
         if self.last_click == 0 and click == 1 and 0 < pos[1] < (height - self.h_keys):
             self.keyboards_flag = not self.keyboards_flag
         self.last_click = 0 if click == 0 else 1
 
     def keyboards_draw(self):
         pygame.draw.rect(display, (60, 63, 65), (0, (height - self.h_keys), width, height))
-        for y in range(len(self.keys)):
-            for x in range(len(self.keys[y])):
-                _x = x * width // len(self.keys[y])
-                _y = (height - self.h_keys) + y * self.h_keys // len(self.keys)
-                pygame.draw.rect(
-                    display,
-                    (60, 63, 65),
-                    (_x, _y, width // len(self.keys[y]), self.h_keys // len(self.keys))
-                )
-                text_print(message=self.keys[y][x], x=_x, y=_y, font_size=170 // divider)
-                print(f'["{self.keys[y][x]}", ({_x} // divider, {_y} // divider, {width // len(self.keys[y])} // divider, {self.h_keys // len(self.keys)} // divider)]')
-            print()
-        time.sleep(10)
-        _x = 10 * width // 11
-        _y = (height - self.h_keys) + 4 * self.h_keys // len(self.keys)
-        pygame.draw.rect(display, (0, 0, 0), (_x, _y, width // len(self.keys[3]), self.h_keys // len(self.keys)))
-        text_print(message='#', x=_x, y=_y, font_size=170 // divider)
-        _x = 0
-        pygame.draw.rect(display, (0, 0, 0), (_x, _y, width // len(self.keys[3]), self.h_keys // len(self.keys)))
-        text_print(message='.',
-                   x=_x + width // 11 // 10, y=_y - self.h_keys // len(self.keys) // 10,
-                   font_size=170 // divider)
+        for y in self.key:
+            for x in y:
+                pygame.draw.rect(display, (60, 63, 65), x[1])
+                if len(x) == 2:
+                    text_print(message=x[0], x=x[1][0], y=x[1][1], font_size=170 // divider)
+                else:
+                    text_print(message=x[0], x=x[1][0] + x[2][0], y=x[1][1] + x[2][1], font_size=170 // divider)
 
     def add_lesson(self):
         for index in [int(num) for num in input('День недели(0-4) через пробел: ').split()]:
@@ -198,7 +178,7 @@ class Diary:
 
 if __name__ == '__main__':
     # Инициализация
-    divider = 1
+    divider = 2
     width = 1080 // divider
     height = 2240 // divider
     pygame.init()
