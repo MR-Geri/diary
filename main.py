@@ -13,7 +13,8 @@ class Diary:
     def __init__(self):
         #
         try:
-            self.file = json.load(open('data/data.json'))
+            with open('data/data.json') as f:
+                self.file = json.load(f)
         except:
             self.file = [
                 {
@@ -37,6 +38,7 @@ class Diary:
                     "lessons": []
                 }
             ]
+        print(self.file)
         #
         now = datetime.datetime.weekday(datetime.datetime.now())
         self.day = 0 if now == 5 or now == 6 else now
@@ -45,60 +47,60 @@ class Diary:
         self.text_keyboard = ''
         self.keys = [
             [
-                ["1", (0 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["2", (108 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["3", (216 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["4", (324 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["5", (432 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["6", (540 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["7", (648 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["8", (756 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["9", (864 // divider, 1340 // divider, 108 // divider, 180 // divider)],
-                ["0", (972 // divider, 1340 // divider, 108 // divider, 180 // divider)]
+                ["1", (0, 1340, 108, 180)],
+                ["2", (108, 1340, 108, 180)],
+                ["3", (216, 1340, 108, 180)],
+                ["4", (324, 1340, 108, 180)],
+                ["5", (432, 1340, 108, 180)],
+                ["6", (540, 1340, 108, 180)],
+                ["7", (648, 1340, 108, 180)],
+                ["8", (756, 1340, 108, 180)],
+                ["9", (864, 1340, 108, 180)],
+                ["0", (972, 1340, 108, 180)]
             ],
             [
-                ["й", (0 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["ц", (98 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["у", (196 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["к", (294 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["е", (392 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["н", (490 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["г", (589 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["ш", (687 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["щ", (785 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["з", (883 // divider, 1520 // divider, 98 // divider, 180 // divider)],
-                ["х", (981 // divider, 1520 // divider, 98 // divider, 180 // divider)]
+                ["й", (0, 1520, 98, 180)],
+                ["ц", (98, 1520, 98, 180)],
+                ["у", (196, 1520, 98, 180)],
+                ["к", (294, 1520, 98, 180)],
+                ["е", (392, 1520, 98, 180)],
+                ["н", (490, 1520, 98, 180)],
+                ["г", (589, 1520, 98, 180)],
+                ["ш", (687, 1520, 98, 180)],
+                ["щ", (785, 1520, 98, 180)],
+                ["з", (883, 1520, 98, 180)],
+                ["х", (981, 1520, 98, 180)]
             ],
             [
-                ["ф", (0 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["ы", (98 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["в", (196 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["а", (294 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["п", (392 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["р", (490 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["о", (589 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["л", (687 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["д", (785 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["ж", (883 // divider, 1700 // divider, 98 // divider, 180 // divider)],
-                ["э", (981 // divider, 1700 // divider, 98 // divider, 180 // divider)]
+                ["ф", (0, 1700, 98, 180)],
+                ["ы", (98, 1700, 98, 180)],
+                ["в", (196, 1700, 98, 180)],
+                ["а", (294, 1700, 98, 180)],
+                ["п", (392, 1700, 98, 180)],
+                ["р", (490, 1700, 98, 180)],
+                ["о", (589, 1700, 98, 180)],
+                ["л", (687, 1700, 98, 180)],
+                ["д", (785, 1700, 98, 180)],
+                ["ж", (883, 1700, 98, 180)],
+                ["э", (981, 1700, 98, 180)]
             ],
             [
-                ["я", (0 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["ч", (98 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["с", (196 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["м", (294 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["и", (392 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["т", (490 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["ь", (589 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["ъ", (687 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["б", (785 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["ю", (883 // divider, 1880 // divider, 98 // divider, 180 // divider)],
-                ["<", (981 // divider, 1880 // divider, 98 // divider, 180 // divider)]
+                ["я", (0, 1880, 98, 180)],
+                ["ч", (98, 1880, 98, 180)],
+                ["с", (196, 1880, 98, 180)],
+                ["м", (294, 1880, 98, 180)],
+                ["и", (392, 1880, 98, 180)],
+                ["т", (490, 1880, 98, 180)],
+                ["ь", (589, 1880, 98, 180)],
+                ["ъ", (687, 1880, 98, 180)],
+                ["б", (785, 1880, 98, 180)],
+                ["ю", (883, 1880, 98, 180)],
+                ["<", (981, 1880, 98, 180)]
             ],
             [
-                [".", (98 // divider, 2060 // divider, 98 // divider, 180 // divider)],
-                [' ', (196 // divider, 2060 // divider, 98 // divider * 7, 180 // divider)],
-                ["#", (883 // divider, 2060 // divider, 98 // divider, 180 // divider)]
+                [".", (98, 2060, 98, 180)],
+                [' ', (196, 2060, 98 * 7, 180)],
+                ["#", (883, 2060, 98, 180)]
             ]
         ]
         self.height_block_keys = height // 2 - 220
@@ -129,11 +131,12 @@ class Diary:
         self.last_click = 0 if click == 0 else 1
 
     def keyboards_draw(self):
+        print()
         pygame.draw.rect(display, (60, 63, 65), (0, (height - self.height_block_keys), width, height))
         for y in self.keys:
             for x in y:
                 pygame.draw.rect(display, (60, 63, 65), x[1])
-                text_print(message=x[0], x=x[1][0], y=x[1][1], font_size=170 // divider)
+                text_print(message=x[0], x=x[1][0], y=x[1][1], font_size=170)
 
     def card_draw(self):
         lessons = self.file[self.day]['lessons']
@@ -141,13 +144,13 @@ class Diary:
         date += datetime.timedelta(days=self.day)
         text_print(message=f'{self.file[self.day]["day"]} {date}', x=30, y=20, font_color=(255, 255, 255))
         for i in range(len(lessons)):
-            x = 20 // divider
-            y_size = ((height - self.height_block_keys - 40 // divider - 15) // 8)
+            x = 20
+            y_size = ((height - self.height_block_keys - 40 - 15) // 8)
             y = 60 + y_size * i
             pygame.draw.rect(display, (60, 63, 65), (
                 x,
                 y,
-                width - 40 // divider,
+                width - 40,
                 y_size - 10
             ))
             text_print(
@@ -179,7 +182,7 @@ class Diary:
     def save(self):
         """ Сохранение данных в json"""
         try:
-            with open('data/data.json', 'w') as file:
+            with open('data/data.json', "w") as file:
                 json.dump(self.file, file, indent=2, ensure_ascii=False)
         except:
             print("ERROR save_json_data")
@@ -197,9 +200,8 @@ class Diary:
 
 if __name__ == '__main__':
     # Инициализация
-    divider = 1
-    width = 1080 // divider
-    height = 2240 // divider
+    width = 1080
+    height = 2240
     pygame.init()
     display = pygame.display.set_mode((width, height))
 
