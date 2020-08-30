@@ -58,6 +58,7 @@ class Diary:
         self.cards_height = int(height - self.cards_y0)
         self.cards_text_size = int((width + height) / 3320 * 60)
         self.card_height = int(self.cards_height / 8)
+        self.card_text_obr = 32 if (width + height) == 3320 else 31
 
     def keyboard_action(self, pos, click):
         for y in self.keys:
@@ -104,21 +105,23 @@ class Diary:
                    y=0,
                    font_size=self.cards_text_size)
         for i in range(len(lessons)):
+            x = (12 / 1000) * width
             y = self.cards_y0 + self.card_height * i
             pygame.draw.rect(display, (random.randint(0, 255), 43, 43), (0, y, width, self.card_height))
-            text = f'{lessons[i].get("time_start")}-{lessons[i].get("time_finish")}'
+            text = f'{lessons[i].get("time_start")}-{lessons[i].get("time_finish")}  ' \
+                   f'{lessons[i].get("lesson")}'
             text_print(message=text,
-                       x=(12 / 1000) * width,
-                       y=y * 1 + self.card_height * (12 / 100),
+                       x=x,
+                       y=y + self.card_height * (12 / 100),
                        font_size=self.cards_text_size)
             task = lessons[i].get("task")
-            num = 2
+            num = 1
             while len(task) > 0:
-                text_print(message=task[:int((width + height) / 3320 * 62)],
-                           x=(12 / 1000) * width,
-                           y=y * num + self.card_height * (12 / 100),
+                text_print(message=task[:self.card_text_obr],
+                           x=x,
+                           y=y + self.card_height * (12 / 100) + self.card_height / 5 * num,
                            font_size=self.cards_text_size)
-                task = task[int((width + height) / 3320 * 62):]
+                task = task[self.card_text_obr:]
                 num += 1
 
     def draw_all(self):
@@ -138,7 +141,7 @@ class Diary:
                     {"lesson": input('\tНазвание предмета: '),
                      "time_start": input('\tНачало урока: '),
                      "time_finish": input('\tКонец урока: '),
-                     "task": "Домашнее задание"}
+                     "task": "1234567890123456789012345678901234567890123456789012345678901234567890"}
                 )
         for day in self.file:
             print(day)
