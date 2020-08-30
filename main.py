@@ -45,78 +45,26 @@ class Diary:
         #
         self.last_click = 0
         self.text_keyboard = ''
-        self.keys = [
-            [
-                ["1", (0, 1340, 108, 180)],
-                ["2", (108, 1340, 108, 180)],
-                ["3", (216, 1340, 108, 180)],
-                ["4", (324, 1340, 108, 180)],
-                ["5", (432, 1340, 108, 180)],
-                ["6", (540, 1340, 108, 180)],
-                ["7", (648, 1340, 108, 180)],
-                ["8", (756, 1340, 108, 180)],
-                ["9", (864, 1340, 108, 180)],
-                ["0", (972, 1340, 108, 180)]
-            ],
-            [
-                ["й", (0, 1520, 98, 180)],
-                ["ц", (98, 1520, 98, 180)],
-                ["у", (196, 1520, 98, 180)],
-                ["к", (294, 1520, 98, 180)],
-                ["е", (392, 1520, 98, 180)],
-                ["н", (490, 1520, 98, 180)],
-                ["г", (589, 1520, 98, 180)],
-                ["ш", (687, 1520, 98, 180)],
-                ["щ", (785, 1520, 98, 180)],
-                ["з", (883, 1520, 98, 180)],
-                ["х", (981, 1520, 98, 180)]
-            ],
-            [
-                ["ф", (0, 1700, 98, 180)],
-                ["ы", (98, 1700, 98, 180)],
-                ["в", (196, 1700, 98, 180)],
-                ["а", (294, 1700, 98, 180)],
-                ["п", (392, 1700, 98, 180)],
-                ["р", (490, 1700, 98, 180)],
-                ["о", (589, 1700, 98, 180)],
-                ["л", (687, 1700, 98, 180)],
-                ["д", (785, 1700, 98, 180)],
-                ["ж", (883, 1700, 98, 180)],
-                ["э", (981, 1700, 98, 180)]
-            ],
-            [
-                ["я", (0, 1880, 98, 180)],
-                ["ч", (98, 1880, 98, 180)],
-                ["с", (196, 1880, 98, 180)],
-                ["м", (294, 1880, 98, 180)],
-                ["и", (392, 1880, 98, 180)],
-                ["т", (490, 1880, 98, 180)],
-                ["ь", (589, 1880, 98, 180)],
-                ["ъ", (687, 1880, 98, 180)],
-                ["б", (785, 1880, 98, 180)],
-                ["ю", (883, 1880, 98, 180)],
-                ["<", (981, 1880, 98, 180)]
-            ],
-            [
-                [".", (98, 2060, 98, 180)],
-                [' ', (196, 2060, 98 * 7, 180)],
-                ["#", (883, 2060, 98, 180)]
-            ]
-        ]
+        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' .       # ']
         self.height_block_keys = height // 2 - 220
         self.card_flag = True
+        self.size_text_keys = int((width + height) / 3320 * 180)
+        self.y0_block_keys = height * (6 / 10)
+        self.keys_height = (height - self.y0_block_keys) / 5
 
     def keyboards_action(self, pos, click):
         for y in self.keys:
-            for x in y:
-                if x[1][0] < pos[0] < x[1][0] + x[1][2] and x[1][1] < pos[1] < x[1][1] + x[1][3] \
-                        and click == 1 and self.last_click == 0:
-                    if x[0] == '<':
+            for x in range(len(y)):
+                keys_width = width / len(y)
+                pos_y = self.y0_block_keys + self.keys_height * self.keys.index(y)
+                if keys_width * x < pos[0] < keys_width * x + keys_width\
+                        and pos_y < pos[1] < pos_y + self.keys_height and click == 1 and self.last_click == 0:
+                    if y[x] == '<':
                         self.text_keyboard = self.text_keyboard[:-1]
-                    elif x[0] == '#':
+                    elif y[x] == '#':
                         self.text_keyboard += '\n'
                     else:
-                        self.text_keyboard += x[0]
+                        self.text_keyboard += y[x]
                     main.draw_all()
 
     def card_action(self, pos, click):
@@ -131,12 +79,14 @@ class Diary:
         self.last_click = 0 if click == 0 else 1
 
     def keyboards_draw(self):
-        print()
-        pygame.draw.rect(display, (60, 63, 65), (0, (height - self.height_block_keys), width, height))
+        pygame.draw.rect(display, (60, 63, 65), (0, self.y0_block_keys, width, height - self.y0_block_keys))
         for y in self.keys:
-            for x in y:
-                pygame.draw.rect(display, (60, 63, 65), x[1])
-                text_print(message=x[0], x=x[1][0], y=x[1][1], font_size=170)
+            for x in range(len(y)):
+                keys_width = width / len(y)
+                text_print(y[x],
+                           x=keys_width * x,
+                           y=self.y0_block_keys + self.keys_height * self.keys.index(y) + self.keys_height / 15,
+                           font_size=self.size_text_keys)
 
     def card_draw(self):
         lessons = self.file[self.day]['lessons']
@@ -160,9 +110,9 @@ class Diary:
     def draw_all(self):
         pygame.draw.rect(display, (43, 43, 43), (0, 0, width, height))
         main.keyboards_draw()
-        # text_print(message=self.text_keyboard, x=0, y=200, font_size=50)
         if self.card_flag:
             main.card_draw()
+        text_print(message=self.text_keyboard, x=0, y=200, font_size=50)
         pygame.display.update()
 
     def add_lesson(self):
@@ -200,8 +150,8 @@ class Diary:
 
 if __name__ == '__main__':
     # Инициализация
-    width = 1080
-    height = 2240
+    width = 1080 // 2
+    height = 2240 // 2
     pygame.init()
     display = pygame.display.set_mode((width, height))
 
