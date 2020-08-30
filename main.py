@@ -1,3 +1,6 @@
+import math
+import random
+
 import pygame
 import json
 import datetime
@@ -6,7 +9,7 @@ import datetime
 def text_print(message, x, y, font_color=(255, 255, 255), font_size=30, font_type='data/shrift.otf'):
     font_type = pygame.font.Font(font_type, font_size)
     text = font_type.render(message, True, font_color)
-    display.blit(text, (x, y))
+    display.blit(text, (int(x), int(y)))
 
 
 class Diary:
@@ -47,17 +50,22 @@ class Diary:
         self.text_keyboard = ''
         self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' .       # ']
         self.card_flag = True
-        self.keys_text_size = int((width + height) / 3320 * 180)
-        self.keys_y0 = height * (6 / 10)
-        self.keys_height = (height - self.keys_y0) / 5
+        self.keyboards_flag = False
+        self.keyboard_text_size = int((width + height) / 3320 * 180)
+        self.keyboard_y0 = int(height * (6 / 10))
+        self.keyboard_height = int((height - self.keyboard_y0) / 5)
+        self.cards_y0 = int((4 / 100) * (height - self.keyboard_height * 5))
+        self.cards_height = int(height - self.cards_y0)
+        self.cards_text_size = int((width + height) / 3320 * 60)
+        self.card_height = int(self.cards_height / 8)
 
-    def keyboards_action(self, pos, click):
+    def keyboard_action(self, pos, click):
         for y in self.keys:
             for x in range(len(y)):
                 keys_width = width / len(y)
-                pos_y = self.keys_y0 + self.keys_height * self.keys.index(y)
+                pos_y = self.keyboard_y0 + self.keyboard_height * self.keys.index(y)
                 if keys_width * x < pos[0] < keys_width * x + keys_width\
-                        and pos_y < pos[1] < pos_y + self.keys_height and click == 1 and self.last_click == 0:
+                        and pos_y < pos[1] < pos_y + self.keyboard_height and click == 1 and self.last_click == 0:
                     if y[x] == '<':
                         self.text_keyboard = self.text_keyboard[:-1]
                     elif y[x] == '#':
@@ -72,43 +80,51 @@ class Diary:
     def action(self):
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
-        main.keyboards_action(pos, click)
+        main.keyboard_action(pos, click)
         if self.card_flag:
             main.card_action(pos, click)
         self.last_click = 0 if click == 0 else 1
 
     def keyboards_draw(self):
-        pygame.draw.rect(display, (60, 63, 65), (0, self.keys_y0, width, height - self.keys_y0))
+        pygame.draw.rect(display, (60, 63, 65), (0, self.keyboard_y0, width, height - self.keyboard_y0))
         for y in self.keys:
             for x in range(len(y)):
                 keys_width = width / len(y)
                 text_print(y[x],
                            x=keys_width * x,
-                           y=self.keys_y0 + self.keys_height * self.keys.index(y) + self.keys_height / 15,
-                           font_size=self.keys_text_size)
+                           y=self.keyboard_y0 + self.keyboard_height * self.keys.index(y) + self.keyboard_height / 15,
+                           font_size=self.keyboard_text_size)
 
     def card_draw(self):
         lessons = self.file[self.day]['lessons']
         date = datetime.date.today()
         date += datetime.timedelta(days=self.day)
-        text_print(message=f'{self.file[self.day]["day"]} {date}', x=30, y=20, font_color=(255, 255, 255))
+        text_print(message=f'{self.file[self.day]["day"]} {date}',
+                   x=(2 / 100) * width,
+                   y=0,
+                   font_size=self.cards_text_size)
         for i in range(len(lessons)):
-            x = 20
-            y_size = ((height - self.keys_height - 40 - 15) // 8)
-            y = 60 + y_size * i
-            pygame.draw.rect(display, (60, 63, 65), (
-                x,
-                y,
-                width - 40,
-                y_size - 10
-            ))
-            text_print(
-                message=f'{lessons[i].get("time_start")}-{lessons[i].get("time_finish")}',
-                x=x + 10, y=y + 10, font_size=30)
+            y = self.cards_y0 + self.card_height * i
+            pygame.draw.rect(display, (random.randint(0, 255), 43, 43), (0, y, width, self.card_height))
+            text = f'{lessons[i].get("time_start")}-{lessons[i].get("time_finish")}'
+            text_print(message=text,
+                       x=(12 / 1000) * width,
+                       y=y * 1 + self.card_height * (12 / 100),
+                       font_size=self.cards_text_size)
+            task = lessons[i].get("task")
+            num = 2
+            while len(task) > 0:
+                text_print(message=task[:int((width + height) / 3320 * 62)],
+                           x=(12 / 1000) * width,
+                           y=y * num + self.card_height * (12 / 100),
+                           font_size=self.cards_text_size)
+                task = task[int((width + height) / 3320 * 62):]
+                num += 1
 
     def draw_all(self):
         pygame.draw.rect(display, (43, 43, 43), (0, 0, width, height))
-        main.keyboards_draw()
+        if self.keyboards_flag:
+            main.keyboards_draw()
         if self.card_flag:
             main.card_draw()
         text_print(message=self.text_keyboard, x=0, y=200, font_size=50)
