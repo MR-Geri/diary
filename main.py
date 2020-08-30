@@ -46,17 +46,16 @@ class Diary:
         self.last_click = 0
         self.text_keyboard = ''
         self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' .       # ']
-        self.height_block_keys = height // 2 - 220
         self.card_flag = True
-        self.size_text_keys = int((width + height) / 3320 * 180)
-        self.y0_block_keys = height * (6 / 10)
-        self.keys_height = (height - self.y0_block_keys) / 5
+        self.keys_text_size = int((width + height) / 3320 * 180)
+        self.keys_y0 = height * (6 / 10)
+        self.keys_height = (height - self.keys_y0) / 5
 
     def keyboards_action(self, pos, click):
         for y in self.keys:
             for x in range(len(y)):
                 keys_width = width / len(y)
-                pos_y = self.y0_block_keys + self.keys_height * self.keys.index(y)
+                pos_y = self.keys_y0 + self.keys_height * self.keys.index(y)
                 if keys_width * x < pos[0] < keys_width * x + keys_width\
                         and pos_y < pos[1] < pos_y + self.keys_height and click == 1 and self.last_click == 0:
                     if y[x] == '<':
@@ -79,14 +78,14 @@ class Diary:
         self.last_click = 0 if click == 0 else 1
 
     def keyboards_draw(self):
-        pygame.draw.rect(display, (60, 63, 65), (0, self.y0_block_keys, width, height - self.y0_block_keys))
+        pygame.draw.rect(display, (60, 63, 65), (0, self.keys_y0, width, height - self.keys_y0))
         for y in self.keys:
             for x in range(len(y)):
                 keys_width = width / len(y)
                 text_print(y[x],
                            x=keys_width * x,
-                           y=self.y0_block_keys + self.keys_height * self.keys.index(y) + self.keys_height / 15,
-                           font_size=self.size_text_keys)
+                           y=self.keys_y0 + self.keys_height * self.keys.index(y) + self.keys_height / 15,
+                           font_size=self.keys_text_size)
 
     def card_draw(self):
         lessons = self.file[self.day]['lessons']
@@ -95,7 +94,7 @@ class Diary:
         text_print(message=f'{self.file[self.day]["day"]} {date}', x=30, y=20, font_color=(255, 255, 255))
         for i in range(len(lessons)):
             x = 20
-            y_size = ((height - self.height_block_keys - 40 - 15) // 8)
+            y_size = ((height - self.keys_height - 40 - 15) // 8)
             y = 60 + y_size * i
             pygame.draw.rect(display, (60, 63, 65), (
                 x,
@@ -132,8 +131,8 @@ class Diary:
     def save(self):
         """ Сохранение данных в json"""
         try:
-            with open('data/data.json', "w") as file:
-                json.dump(self.file, file, indent=2, ensure_ascii=False)
+            with open('data/data.json', 'w') as f:
+                json.dump(self.file, f, indent=2)
         except:
             print("ERROR save_json_data")
 
