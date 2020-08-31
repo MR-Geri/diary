@@ -40,7 +40,6 @@ class Diary:
                     "lessons": []
                 }
             ]
-        print(self.file)
         #
         now = datetime.datetime.weekday(datetime.datetime.now())
         self.day = 0 if now == 5 or now == 6 else now
@@ -55,6 +54,7 @@ class Diary:
         self.swype_pos = ()
         self.date = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
         self.date += datetime.timedelta(days=self.day)
+        self.card_click_num = 0
         #
         self.keyboard_text_size = int((width + height) / 3320 * 180)
         self.keyboard_y0 = int(height * (6 / 10))
@@ -86,6 +86,7 @@ class Diary:
             if y < pos[1] < y + self.card_height and click == 0 and self.last_click == 1:
                 self.keyboards_flag = True
                 self.cards_flag = False
+                self.card_click_num = i
 
     def action(self):
         pos = pygame.mouse.get_pos()
@@ -94,11 +95,11 @@ class Diary:
             self.swype_pos = pos[0]
             self.swype = True
         elif self.swype and self.last_click == 1 and click == 0:
-            if pos[0] - self.swype_pos < 0 and abs(pos[0] - self.swype_pos) >= width * (1/4):
+            if pos[0] - self.swype_pos < 0 and abs(pos[0] - self.swype_pos) >= width * (1/4) and self.cards_flag:
                 self.day += 1
                 self.day = 0 if self.day == 5 else self.day
                 main.draw_all()
-            elif pos[0] - self.swype_pos > 0 and abs(pos[0] - self.swype_pos) >= width * (1/4):
+            elif pos[0] - self.swype_pos > 0 and abs(pos[0] - self.swype_pos) >= width * (1/4) and self.cards_flag:
                 self.day -= 1
                 self.day = 4 if self.day == -1 else self.day
             else:
@@ -114,13 +115,19 @@ class Diary:
         pygame.draw.rect(display, (60, 63, 65), (0, 0, width, height))
         text_height = self.keyboard_y0
         pygame.draw.rect(display, (255, 255, 255), (0, 0, width, text_height))
-        text_ = f'{self.file[self.day]["day"]} {self.date}'
-        text_print(message=text_,
-                   x=(2 / 100) * width + width / self.card_text_obr * (self.card_text_obr - len(text_)) / 2,
-                   y=0,
-                   font_size=self.cards_text_size,
-                   font_color=(0, 0, 0)
-                   )
+        text = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
+                '', 'Старое домашнее задание:']
+        task = self.lessons[self.card_click_num].get("task")
+        while len(task) > 0:
+            text.append(task[:self.card_text_obr])
+            task = task[self.card_text_obr:]
+        for i in range(len(text)):
+            text_print(message=text[i],
+                       x=(12 / 1000) * width + width / self.card_text_obr * (self.card_text_obr - len(text[i])) / 2,
+                       y=self.card_height / 5 * i,
+                       font_size=self.cards_text_size,
+                       font_color=(0, 0, 0)
+                       )
         for y in self.keys:
             for x in range(len(y)):
                 keys_width = width / len(y)
