@@ -4,9 +4,9 @@ import pygame
 import json
 import datetime
 
-width = 1080
-height = 2240
-set_lesson_flag = False
+width = 1080 // 2
+height = 2240 // 2
+set_lesson_flag = True
 
 
 def text_print(message, x, y, font_color=(255, 255, 255), font_size=30, font_type='data/shrift.otf'):
@@ -59,7 +59,7 @@ class Diary:
         self.date = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
         self.date += datetime.timedelta(days=self.day)
         self.card_click_num = 0
-        self.color = [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(8)]
+        self.color = [(55, 55, 55) if i % 2 != 0 else (128, 128, 128) for i in range(8)]
         #
         self.keyboard_text_size = int((width + height) / 3320 * 180)
         self.keyboard_y0 = int(height * (6 / 10))
@@ -86,6 +86,7 @@ class Diary:
                         self.text_keyboard = ''
                         self.cards_flag = True
                         self.keyboards_flag = False
+                        self.last_click = 0
                     else:
                         self.text_keyboard += y[x]
                     main.draw_all()
@@ -231,7 +232,7 @@ class Diary:
                     quit()
                 for lesson in lessons:
                     lesson = lesson.split('-')
-                    if len(lessons) > 3:
+                    if len(lesson) > 3:
                         print('Ошибка в записи урока => (Название начало конец)')
                         quit()
                     self.file[days.index(day)]['lessons'].append(
