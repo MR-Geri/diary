@@ -68,7 +68,7 @@ class Diary:
         self.cards_height = int(height - self.cards_y0)
         self.cards_text_size = int((width + height) / 3320 * 60)
         font_type = pygame.font.Font('data/shrift.otf', self.cards_text_size)
-        self.card_text_obr = int(width / font_type.render('а', True, (255, 255, 255)).get_width())
+        self.card_text_crop = int(width / font_type.render('а', True, (255, 255, 255)).get_width())
         self.card_height = int(self.cards_height / 8)
 
     def keyboard_action(self, pos, click):
@@ -133,17 +133,17 @@ class Diary:
         new_dz = []
         task = self.lessons[self.card_click_num]["task"]
         while len(task) > 0:
-            last_dz.append(task[:self.card_text_obr])
-            task = task[self.card_text_obr:]
+            last_dz.append(task[:self.card_text_crop])
+            task = task[self.card_text_crop:]
         text_keyboard = self.text_keyboard
         while len(text_keyboard) > 0:
-            new_dz.append(text_keyboard[:self.card_text_obr])
-            text_keyboard = text_keyboard[self.card_text_obr:]
+            new_dz.append(text_keyboard[:self.card_text_crop])
+            text_keyboard = text_keyboard[self.card_text_crop:]
         last_dz = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
                    '', 'Старое домашнее задание:', *last_dz, '', 'Новое домашнее задание:', *new_dz]
         for i in range(len(last_dz)):
             text_print(message=last_dz[i],
-                       x=(12 / 1000) * width + width / self.card_text_obr * (self.card_text_obr - len(last_dz[i])) / 2,
+                       x=(12 / 1000) * width + width / self.card_text_crop * (self.card_text_crop - len(last_dz[i])) / 2,
                        y=self.card_height / 5 * i,
                        font_size=self.cards_text_size
                        )
@@ -161,7 +161,7 @@ class Diary:
         text = f'{self.file[self.day]["day"]} {self.date}'
         x = (12 / 1000) * width
         text_print(message=text,
-                   x=x + width / self.card_text_obr * (self.card_text_obr - len(text)) / 2,
+                   x=x + width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
                    y=0,
                    font_size=self.cards_text_size)
         for i in range(len(self.lessons)):
@@ -179,11 +179,11 @@ class Diary:
             task = self.lessons[i].get("task")
             num = 1
             while len(task) > 0:
-                text_print(message=task[:self.card_text_obr],
+                text_print(message=task[:self.card_text_crop],
                            x=x,
                            y=y + self.card_height * (12 / 100) + self.card_height / 5 * num,
                            font_size=self.cards_text_size)
-                task = task[self.card_text_obr:]
+                task = task[self.card_text_crop:]
                 num += 1
 
     def draw_all(self):
