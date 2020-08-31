@@ -186,19 +186,54 @@ class Diary:
             main.cards_draw()
         pygame.display.update()
 
-    def add_lesson(self):
-        for index in [int(num) for num in input('День недели(0-4) через пробел: ').split()]:
-            print(self.file[index]['day'])
-            for les in range(int(input('Количество предметов: '))):
-                self.file[index]['lessons'].append(
-                    {"lesson": input('\tНазвание предмета: '),
-                     "time_start": input('\tНачало урока: '),
-                     "time_finish": input('\tКонец урока: '),
-                     "task": ""}
-                )
-        for day in self.file:
-            print(day)
-        main.save()
+    def set_lesson(self):
+        try:
+            self.file = [
+                {
+                    "day": "Понедельник",
+                    "lessons": []
+                },
+                {
+                    "day": "Вторник",
+                    "lessons": []
+                },
+                {
+                    "day": "Среда",
+                    "lessons": []
+                },
+                {
+                    "day": "Четверг",
+                    "lessons": []
+                },
+                {
+                    "day": "Пятница",
+                    "lessons": []
+                }
+            ]
+            days = open('data/schedule.text', encoding='utf-8').read().split('\n')
+            if len(days) > 5:
+                print('Задать можно не более 5 учебных дней')
+                quit()
+            for day in days:
+                lessons = day.split('/')
+                if len(lessons) > 8:
+                    print('Задать можно не более 8 уроков в день')
+                    quit()
+                for lesson in lessons:
+                    lesson = lesson.split()
+                    if len(lessons) > 3:
+                        print('Ошибка в записи урока => (Название начало конец)')
+                        quit()
+                    self.file[days.index(day)]['lessons'].append(
+                        {"lesson": lesson[0],
+                         "time_start": lesson[1],
+                         "time_finish": lesson[2],
+                         "task": ""}
+                    )
+            main.save()
+            print('Расписание установлено')
+        except:
+            print('Ошибка в установке расписания. Ознакомьтесь с правилами записи в README.md')
 
     def save(self):
         """ Сохранение данных в json"""
@@ -223,9 +258,12 @@ if __name__ == '__main__':
     # Инициализация
     width = 1080 // 2
     height = 2240 // 2
+    set_lesson_flag = False
     pygame.init()
     display = pygame.display.set_mode((width, height))
 
     # Запуск
     main = Diary()
+    if set_lesson_flag:
+        main.set_lesson()
     main.run()
