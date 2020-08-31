@@ -4,8 +4,8 @@ import pygame
 import json
 import datetime
 
-width = 1080
-height = 2240
+width = 1080 // 2
+height = 2240 // 2
 set_lesson_flag = False
 
 
@@ -128,16 +128,21 @@ class Diary:
 
     def keyboards_draw(self):
         pygame.draw.rect(display, (60, 63, 65), (0, 0, width, height))
-        text = []
+        last_dz = []
+        new_dz = []
         task = self.lessons[self.card_click_num]["task"]
         while len(task) > 0:
-            text.append(task[:self.card_text_obr])
+            last_dz.append(task[:self.card_text_obr])
             task = task[self.card_text_obr:]
-        text = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
-                '', 'Старое домашнее задание:', *text, '', 'Новое домашнее задание:', self.text_keyboard]
-        for i in range(len(text)):
-            text_print(message=text[i],
-                       x=(12 / 1000) * width + width / self.card_text_obr * (self.card_text_obr - len(text[i])) / 2,
+        text_keyboard = self.text_keyboard
+        while len(text_keyboard) > 0:
+            new_dz.append(text_keyboard[:self.card_text_obr])
+            text_keyboard = text_keyboard[self.card_text_obr:]
+        last_dz = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
+                   '', 'Старое домашнее задание:', *last_dz, '', 'Новое домашнее задание:', *new_dz]
+        for i in range(len(last_dz)):
+            text_print(message=last_dz[i],
+                       x=(12 / 1000) * width + width / self.card_text_obr * (self.card_text_obr - len(last_dz[i])) / 2,
                        y=self.card_height / 5 * i,
                        font_size=self.cards_text_size
                        )
