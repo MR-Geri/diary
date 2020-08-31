@@ -55,6 +55,7 @@ class Diary:
         self.date = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
         self.date += datetime.timedelta(days=self.day)
         self.card_click_num = 0
+        self.color = [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(8)]
         #
         self.keyboard_text_size = int((width + height) / 3320 * 180)
         self.keyboard_y0 = int(height * (6 / 10))
@@ -153,11 +154,9 @@ class Diary:
                    x=x + width / self.card_text_obr * (self.card_text_obr - len(text)) / 2,
                    y=0,
                    font_size=self.cards_text_size)
-
-        color = [int(i) for i in range(0, 255, 255//7)]
         for i in range(len(self.lessons)):
             y = self.cards_y0 + self.card_height * i
-            pygame.draw.rect(display, (0, color[i], 255), (0, y, width, self.card_height))
+            pygame.draw.rect(display, (self.color[i]), (0, y, width, self.card_height))
             text_print(message=f'{self.lessons[i].get("time_start")}-{self.lessons[i].get("time_finish")}',
                        x=x,
                        y=y + self.card_height * (12 / 100),
