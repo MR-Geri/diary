@@ -1,4 +1,3 @@
-import math
 import random
 
 import pygame
@@ -120,8 +119,9 @@ class Diary:
         lessons = self.file[self.day]['lessons']
         date = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
         date += datetime.timedelta(days=self.day)
-        text_print(message=f'{self.file[self.day]["day"]} {date}',
-                   x=(2 / 100) * width,
+        text = f'{self.file[self.day]["day"]} {date}'
+        text_print(message=text,
+                   x=(2 / 100) * width + width / self.card_text_obr * (self.card_text_obr - len(text)) / 2,
                    y=0,
                    font_size=self.cards_text_size)
         for i in range(len(lessons)):
