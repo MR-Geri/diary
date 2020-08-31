@@ -4,8 +4,8 @@ import pygame
 import json
 import datetime
 
-width = 1080 // 2
-height = 2240 // 2
+width = 1080
+height = 2240
 set_lesson_flag = False
 
 
@@ -67,8 +67,9 @@ class Diary:
         self.cards_y0 = int((4 / 100) * (height - self.keyboard_height * 5))
         self.cards_height = int(height - self.cards_y0)
         self.cards_text_size = int((width + height) / 3320 * 60)
+        font_type = pygame.font.Font('data/shrift.otf', self.cards_text_size)
+        self.card_text_obr = int(width / font_type.render('а', True, (255, 255, 255)).get_width())
         self.card_height = int(self.cards_height / 8)
-        self.card_text_obr = 32 if (width + height) == 3320 else 31
 
     def keyboard_action(self, pos, click):
         for y in self.keys:
