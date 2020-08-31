@@ -96,14 +96,20 @@ class Diary:
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
         if not self.swype and self.last_click == 0 and click == 1:
-            self.swype_pos = pos[0]
+            self.swype_pos = pos
             self.swype = True
         elif self.swype and self.last_click == 1 and click == 0:
-            if pos[0] - self.swype_pos < 0 and abs(pos[0] - self.swype_pos) >= width * (1/4) and self.cards_flag:
+            if pos[1] - self.swype_pos[1] < 0 and \
+                    abs(pos[1] - self.swype_pos[1]) >= height * (1/6) and self.keyboards_flag:
+                self.cards_flag = True
+                self.keyboards_flag = False
+            elif pos[0] - self.swype_pos[0] < 0 and\
+                    abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
                 self.day += 1
                 self.day = 0 if self.day == 5 else self.day
                 main.draw_all()
-            elif pos[0] - self.swype_pos > 0 and abs(pos[0] - self.swype_pos) >= width * (1/4) and self.cards_flag:
+            elif pos[0] - self.swype_pos[0] > 0 and\
+                    abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
                 self.day -= 1
                 self.day = 4 if self.day == -1 else self.day
             else:
@@ -142,11 +148,12 @@ class Diary:
     def cards_draw(self):
         self.lessons = self.file[self.day]['lessons']
         text = f'{self.file[self.day]["day"]} {self.date}'
+        x = (12 / 1000) * width
         text_print(message=text,
-                   x=(2 / 100) * width + width / self.card_text_obr * (self.card_text_obr - len(text)) / 2,
+                   x=x + width / self.card_text_obr * (self.card_text_obr - len(text)) / 2,
                    y=0,
                    font_size=self.cards_text_size)
-        x = (12 / 1000) * width
+
         color = [int(i) for i in range(0, 255, 255//7)]
         for i in range(len(self.lessons)):
             y = self.cards_y0 + self.card_height * i
@@ -188,7 +195,7 @@ class Diary:
                     {"lesson": input('\tНазвание предмета: '),
                      "time_start": input('\tНачало урока: '),
                      "time_finish": input('\tКонец урока: '),
-                     "task": "1234567890123456789012345678901234567890123456789012345678901234567890"}
+                     "task": ""}
                 )
         for day in self.file:
             print(day)
