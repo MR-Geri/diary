@@ -71,11 +71,15 @@ class Diary:
                 keys_width = width / len(y)
                 pos_y = self.keyboard_y0 + self.keyboard_height * self.keys.index(y)
                 if keys_width * x < pos[0] < keys_width * x + keys_width\
-                        and pos_y < pos[1] < pos_y + self.keyboard_height and click == 1 and self.last_click == 0:
+                        and pos_y < pos[1] < pos_y + self.keyboard_height and click == 0 and self.last_click == 1:
                     if y[x] == '<':
                         self.text_keyboard = self.text_keyboard[:-1]
                     elif y[x] == '#':
-                        self.text_keyboard += '\n'
+                        self.file[self.day]['lessons'][self.card_click_num]["task"] = self.text_keyboard
+                        main.save()
+                        self.text_keyboard = ''
+                        self.cards_flag = True
+                        self.keyboards_flag = False
                     else:
                         self.text_keyboard += y[x]
                     main.draw_all()
@@ -113,21 +117,20 @@ class Diary:
 
     def keyboards_draw(self):
         pygame.draw.rect(display, (60, 63, 65), (0, 0, width, height))
-        text_height = self.keyboard_y0
-        pygame.draw.rect(display, (255, 255, 255), (0, 0, width, text_height))
-        text = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
-                '', 'Старое домашнее задание:']
-        task = self.lessons[self.card_click_num].get("task")
+        text = []
+        task = self.lessons[self.card_click_num]["task"]
         while len(task) > 0:
             text.append(task[:self.card_text_obr])
             task = task[self.card_text_obr:]
+        text = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
+                '', 'Старое домашнее задание:', *text, '', 'Новое домашнее задание:', self.text_keyboard]
         for i in range(len(text)):
             text_print(message=text[i],
                        x=(12 / 1000) * width + width / self.card_text_obr * (self.card_text_obr - len(text[i])) / 2,
                        y=self.card_height / 5 * i,
-                       font_size=self.cards_text_size,
-                       font_color=(0, 0, 0)
+                       font_size=self.cards_text_size
                        )
+
         for y in self.keys:
             for x in range(len(y)):
                 keys_width = width / len(y)
@@ -175,7 +178,6 @@ class Diary:
             main.keyboards_draw()
         if self.cards_flag:
             main.cards_draw()
-        text_print(message=self.text_keyboard, x=0, y=200, font_size=50)
         pygame.display.update()
 
     def add_lesson(self):
