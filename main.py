@@ -209,42 +209,41 @@ class Diary:
             self.name_lesson = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.name_lesson.append([text_keyboard[:self.card_text_crop],
-                                         (255, 255, 255) if self.name_lesson_flag else (0, 255, 0)])
+                self.name_lesson.append([text_keyboard[:self.card_text_crop], (255, 255, 255)])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         elif self.time_start_flag:
             self.time_start = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.time_start.append([text_keyboard[:self.card_text_crop],
-                                        (255, 255, 255) if self.time_start_flag else (0, 255, 0)])
+                self.time_start.append([text_keyboard[:self.card_text_crop], (255, 255, 255)])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         elif self.time_finish_flag:
             self.time_finish = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.time_finish.append([text_keyboard[:self.card_text_crop],
-                                         (255, 255, 255) if self.time_finish_flag else (0, 255, 0)])
+                self.time_finish.append([text_keyboard[:self.card_text_crop], (255, 255, 255)])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         elif self.dz_flag:
             self.dz = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.dz.append([text_keyboard[:self.card_text_crop],
-                                (255, 255, 255) if self.dz_flag else (0, 255, 0)])
+                self.dz.append([text_keyboard[:self.card_text_crop], (255, 255, 255)])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         data_print = [
             [f'{self.file[self.day]["day"]} {self.date}', (255, 255, 255)],
-            ['Название урока:', (255, 255, 255)],
+            ['Название урока:', (0, 255, 0) if self.name_lesson_flag else (255, 255, 255)],
             *self.name_lesson,
             ['', (255, 255, 255)],
-            ['Время начала урока:', (255, 255, 255)],
+            ['Время начала урока:',
+             (0, 255, 0) if self.time_start_flag and not self.name_lesson_flag else (255, 255, 255)],
             *self.time_start,
             ['', (255, 255, 255)],
-            ['Время окончания урока:', (255, 255, 255)],
+            ['Время окончания урока:',
+             (0, 255, 0) if self.time_finish_flag and not self.time_start_flag else (255, 255, 255)],
             *self.time_finish,
             ['', (255, 255, 255)],
-            ['Домашнее задание:', (255, 255, 255)],
+            ['Домашнее задание:',
+             (0, 255, 0) if self.dz_flag and not self.time_finish_flag else (255, 255, 255)],
             *self.dz
         ]
         for i in range(len(data_print)):
