@@ -4,6 +4,10 @@ import pygame
 import json
 import datetime
 
+width = 1080
+height = 2240
+set_lesson_flag = False
+
 
 def text_print(message, x, y, font_color=(255, 255, 255), font_size=30, font_type='data/shrift.otf'):
     font_type = pygame.font.Font(font_type, font_size)
@@ -220,7 +224,7 @@ class Diary:
                     print('Задать можно не более 8 уроков в день')
                     quit()
                 for lesson in lessons:
-                    lesson = lesson.split()
+                    lesson = lesson.split('-')
                     if len(lessons) > 3:
                         print('Ошибка в записи урока => (Название начало конец)')
                         quit()
@@ -256,9 +260,6 @@ class Diary:
 
 if __name__ == '__main__':
     # Инициализация
-    width = 1080 // 2
-    height = 2240 // 2
-    set_lesson_flag = False
     pygame.init()
     display = pygame.display.set_mode((width, height))
 
