@@ -1,12 +1,10 @@
-import random
-
 import pygame
 import json
 import datetime
 
 width = 1080 // 2
 height = 2240 // 2
-set_lesson_flag = True
+set_lesson_flag = False
 
 
 def text_print(message, x, y, font_color=(255, 255, 255), font_size=30, font_type='data/shrift.otf'):
@@ -50,16 +48,27 @@ class Diary:
         #
         self.last_click = 0
         self.text_keyboard = ''
-        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' .       # ']
+        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' :       # ']
         self.lessons = self.file[self.day]['lessons']
         self.cards_flag = True
-        self.keyboards_flag = False
+        self.add_task_flag = False
+        self.keyboard_flag = False
+        self.add_lesson_flag = False
         self.swype = False
         self.swype_pos = ()
         self.date = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
         self.date += datetime.timedelta(days=self.day)
         self.card_click_num = 0
         self.color = [(55, 55, 55) if i % 2 != 0 else (128, 128, 128) for i in range(8)]
+        #
+        self.name_lesson_flag = False
+        self.time_start_flag = False
+        self.time_finish_flag = False
+        self.dz_flag = False
+        self.name_lesson = []
+        self.time_start = []
+        self.time_finish = []
+        self.dz = []
         #
         self.keyboard_text_size = int((width + height) / 3320 * 180)
         self.keyboard_y0 = int(height * (6 / 10))
@@ -81,12 +90,28 @@ class Diary:
                     if y[x] == '<':
                         self.text_keyboard = self.text_keyboard[:-1]
                     elif y[x] == '#':
-                        self.file[self.day]['lessons'][self.card_click_num]["task"] = self.text_keyboard
-                        main.save()
-                        self.text_keyboard = ''
-                        self.cards_flag = True
-                        self.keyboards_flag = False
                         self.last_click = 0
+                        if self.name_lesson_flag:
+                            self.name_lesson_flag = False
+                        elif self.time_start_flag:
+                            self.time_start_flag = False
+                        elif self.time_finish_flag:
+                            self.time_finish_flag = False
+                        elif self.dz_flag:
+                            self.dz_flag = False
+                        else:
+                            if self.add_lesson_flag:
+                                main.add_lesson_action()
+                                self.cards_flag = True
+                                self.add_lesson_flag = False
+                                self.keyboard_flag = False
+                            elif self.add_task_flag:
+                                self.file[self.day]['lessons'][self.card_click_num]["task"] = self.text_keyboard
+                                self.cards_flag = True
+                                self.add_task_flag = False
+                                self.keyboard_flag = False
+                                main.save()
+                        self.text_keyboard = ''
                     else:
                         self.text_keyboard += y[x]
                     main.draw_all()
@@ -95,9 +120,35 @@ class Diary:
         for i in range(len(self.lessons)):
             y = self.cards_y0 + self.card_height * i
             if y < pos[1] < y + self.card_height and click == 0 and self.last_click == 1:
-                self.keyboards_flag = True
+                self.add_task_flag = True
                 self.cards_flag = False
+                self.keyboard_flag = True
                 self.card_click_num = i
+        if len(self.lessons) < 8:
+            y = self.cards_y0 + self.card_height * len(self.lessons)
+            if y < pos[1] < y + self.card_height:
+                #
+                self.name_lesson_flag = True
+                self.time_start_flag = True
+                self.time_finish_flag = True
+                self.dz_flag = True
+                self.name_lesson = []
+                self.time_start = []
+                self.time_finish = []
+                self.dz = []
+                #
+                self.add_lesson_flag = True
+                self.keyboard_flag = True
+                self.cards_flag = False
+
+    def add_lesson_action(self):
+        self.file[self.day]['lessons'].append(
+            {"lesson": ''.join(self.name_lesson),
+             "time_start": ''.join(self.time_start),
+             "time_finish": ''.join(self.time_finish),
+             "task": ''.join(self.dz)}
+        )
+        main.save()
 
     def action(self):
         pos = pygame.mouse.get_pos()
@@ -107,9 +158,11 @@ class Diary:
             self.swype = True
         elif self.swype and self.last_click == 1 and click == 0:
             if pos[1] - self.swype_pos[1] < 0 and \
-                    abs(pos[1] - self.swype_pos[1]) >= height * (1/6) and self.keyboards_flag:
+                    abs(pos[1] - self.swype_pos[1]) >= height * (1/6) and (self.add_task_flag or self.add_lesson_flag):
                 self.cards_flag = True
-                self.keyboards_flag = False
+                self.add_task_flag = False
+                self.add_lesson_flag = False
+                self.keyboard_flag = False
             elif pos[0] - self.swype_pos[0] < 0 and\
                     abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
                 self.day += 1
@@ -120,7 +173,7 @@ class Diary:
                 self.day -= 1
                 self.day = 4 if self.day == -1 else self.day
             else:
-                if self.keyboards_flag:
+                if self.add_task_flag or self.add_lesson_flag:
                     main.keyboard_action(pos, click)
                 if self.cards_flag:
                     main.card_action(pos, click)
@@ -128,7 +181,7 @@ class Diary:
             main.draw_all()
         self.last_click = 0 if click == 0 else 1
 
-    def keyboards_draw(self):
+    def add_task_draw(self):
         pygame.draw.rect(display, (60, 63, 65), (0, 0, width, height))
         last_dz = []
         new_dz = []
@@ -140,15 +193,71 @@ class Diary:
         while len(text_keyboard) > 0:
             new_dz.append(text_keyboard[:self.card_text_crop])
             text_keyboard = text_keyboard[self.card_text_crop:]
-        last_dz = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
-                   '', 'Старое домашнее задание:', *last_dz, '', 'Новое домашнее задание:', *new_dz]
-        for i in range(len(last_dz)):
-            text_print(message=last_dz[i],
-                       x=(12 / 1000) * width + width / self.card_text_crop * (self.card_text_crop - len(last_dz[i])) / 2,
+        data_print = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
+                      '', 'Старое домашнее задание:', *last_dz, '', 'Новое домашнее задание:', *new_dz]
+        for i in range(len(data_print)):
+            text_print(message=data_print[i],
+                       x=(12 / 1000) * width + width / self.card_text_crop * (
+                                   self.card_text_crop - len(data_print[i])) / 2,
                        y=self.card_height / 5 * i,
                        font_size=self.cards_text_size
                        )
 
+    def add_lesson_draw(self):
+        pygame.draw.rect(display, (60, 63, 65), (0, 0, width, height))
+        if self.name_lesson_flag:
+            self.name_lesson = []
+            text_keyboard = self.text_keyboard
+            while len(text_keyboard) > 0:
+                self.name_lesson.append([text_keyboard[:self.card_text_crop],
+                                         (255, 255, 255) if self.name_lesson_flag else (0, 255, 0)])
+                text_keyboard = text_keyboard[self.card_text_crop:]
+        elif self.time_start_flag:
+            self.time_start = []
+            text_keyboard = self.text_keyboard
+            while len(text_keyboard) > 0:
+                self.time_start.append([text_keyboard[:self.card_text_crop],
+                                        (255, 255, 255) if self.time_start_flag else (0, 255, 0)])
+                text_keyboard = text_keyboard[self.card_text_crop:]
+        elif self.time_finish_flag:
+            self.time_finish = []
+            text_keyboard = self.text_keyboard
+            while len(text_keyboard) > 0:
+                self.time_finish.append([text_keyboard[:self.card_text_crop],
+                                         (255, 255, 255) if self.time_finish_flag else (0, 255, 0)])
+                text_keyboard = text_keyboard[self.card_text_crop:]
+        elif self.dz_flag:
+            self.dz = []
+            text_keyboard = self.text_keyboard
+            while len(text_keyboard) > 0:
+                self.dz.append([text_keyboard[:self.card_text_crop],
+                                (255, 255, 255) if self.dz_flag else (0, 255, 0)])
+                text_keyboard = text_keyboard[self.card_text_crop:]
+        data_print = [
+            [f'{self.file[self.day]["day"]} {self.date}', (255, 255, 255)],
+            ['Название урока:', (255, 255, 255)],
+            *self.name_lesson,
+            ['', (255, 255, 255)],
+            ['Время начала урока:', (255, 255, 255)],
+            *self.time_start,
+            ['', (255, 255, 255)],
+            ['Время окончания урока:', (255, 255, 255)],
+            *self.time_finish,
+            ['', (255, 255, 255)],
+            ['Домашнее задание:', (255, 255, 255)],
+            *self.dz
+        ]
+        for i in range(len(data_print)):
+            if len(data_print[i]) != 0:
+                text_print(message=data_print[i][0],
+                           x=(12 / 1000) * width + width / self.card_text_crop * (
+                                   self.card_text_crop - len(data_print[i][0])) / 2,
+                           y=self.card_height / 5 * i,
+                           font_size=self.cards_text_size,
+                           font_color=data_print[i][1]
+                           )
+
+    def keyboards_draw(self):
         for y in self.keys:
             for x in range(len(y)):
                 keys_width = width / len(y)
@@ -174,7 +283,8 @@ class Diary:
                        font_size=self.cards_text_size)
             text = f'{self.lessons[i].get("lesson")}'
             text_print(message=text,
-                       x=x + width * (285 / 1000) + int(width * (715 / 1000) / 22 * (22 - len(text)) / 2),
+                       x=x + width * (285 / 1000) +
+                         int(width * (715 / 1000) / self.card_text_crop * (self.card_text_crop - len(text)) / 2),
                        y=y + self.card_height * (12 / 100),
                        font_size=self.cards_text_size)
             task = self.lessons[i].get("task")
@@ -186,15 +296,23 @@ class Diary:
                            font_size=self.cards_text_size)
                 task = task[self.card_text_crop:]
                 num += 1
+        if len(self.lessons) < 8:
+            pygame.draw.rect(display, self.color[len(self.lessons)],
+                             (0, self.cards_y0 + self.card_height * len(self.lessons), width, self.card_height))
+            # text_print('Добавить урок', x=)
 
     def draw_all(self):
         pygame.draw.rect(display, (43, 43, 43), (0, 0, width, height))
         self.date = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
         self.date += datetime.timedelta(days=self.day)
-        if self.keyboards_flag:
-            main.keyboards_draw()
+        if self.add_task_flag:
+            main.add_task_draw()
         if self.cards_flag:
             main.cards_draw()
+        if self.add_lesson_flag:
+            main.add_lesson_draw()
+        if self.keyboard_flag:
+            main.keyboards_draw()
         pygame.display.update()
 
     def set_lesson(self):
