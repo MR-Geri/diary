@@ -90,8 +90,14 @@ class Diary:
         elif self.swype and self.last_click == 1 and click == 0:
             if pos[0] - self.swype_pos < 0 and abs(pos[0] - self.swype_pos) >= width * (1/4):
                 print('Влево')
+                self.day += 1
+                self.day = 0 if self.day == 5 else self.day
+                main.draw_all()
             elif pos[0] - self.swype_pos > 0 and abs(pos[0] - self.swype_pos) >= width * (1/4):
                 print('Вправо')
+                self.day -= 1
+                self.day = 4 if self.day == -1 else self.day
+                main.draw_all()
             else:
                 if self.keyboards_flag:
                     main.keyboard_action(pos, click)
