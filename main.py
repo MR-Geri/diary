@@ -142,10 +142,19 @@ class Diary:
                 self.cards_flag = False
 
     def add_lesson_action(self):
+        start = ''.join(self.time_start)
+        finish = ''.join(self.time_finish)
+        try:
+            with open('data/time.json') as f:
+                time = json.load(f)
+            start = start if len(start) > 0 else time[str(len(self.file[self.day]['lessons']))][0]
+            finish = finish if len(finish) > 0 else time[str(len(self.file[self.day]['lessons']))][1]
+        except:
+            pass
         self.file[self.day]['lessons'].append(
             {"lesson": ''.join(self.name_lesson),
-             "time_start": ''.join(self.time_start),
-             "time_finish": ''.join(self.time_finish),
+             "time_start": start,
+             "time_finish": finish,
              "task": ''.join(self.dz)}
         )
         main.save()
