@@ -301,7 +301,8 @@ class Diary:
             text_print(text,
                        x=width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
                        y=self.cards_y0 + self.card_height * (len(self.lessons)) + self.card_height * (12 / 100) +
-                         self.card_height / 5 * 2
+                         self.card_height / 5 * 2,
+                       font_size=self.cards_text_size
                        )
 
     def draw_all(self):
