@@ -4,7 +4,7 @@ import datetime
 
 width = 1080 // 2
 height = 2240 // 2
-set_lesson_flag = True
+set_lesson_flag = False
 
 
 def text_print(message, x, y, font_color=(255, 255, 255), font_size=30, font_type='data/shrift.otf'):
