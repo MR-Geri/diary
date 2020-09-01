@@ -4,7 +4,7 @@ import datetime
 
 width = 1080 // 2
 height = 2240 // 2
-set_lesson_flag = False
+set_lesson_flag = True
 
 
 def text_print(message, x, y, font_color=(255, 255, 255), font_size=30, font_type='data/shrift.otf'):
@@ -209,51 +209,52 @@ class Diary:
             self.name_lesson = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.name_lesson.append([text_keyboard[:self.card_text_crop], (255, 255, 255)])
+                self.name_lesson.append(text_keyboard[:self.card_text_crop])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         elif self.time_start_flag:
             self.time_start = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.time_start.append([text_keyboard[:self.card_text_crop], (255, 255, 255)])
+                self.time_start.append(text_keyboard[:self.card_text_crop])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         elif self.time_finish_flag:
             self.time_finish = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.time_finish.append([text_keyboard[:self.card_text_crop], (255, 255, 255)])
+                self.time_finish.append(text_keyboard[:self.card_text_crop])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         elif self.dz_flag:
             self.dz = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.dz.append([text_keyboard[:self.card_text_crop], (255, 255, 255)])
+                self.dz.append(text_keyboard[:self.card_text_crop])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         data_print = [
-            [f'{self.file[self.day]["day"]} {self.date}', (255, 255, 255)],
+            f'{self.file[self.day]["day"]} {self.date}',
             ['Название урока:', (0, 255, 0) if self.name_lesson_flag else (255, 255, 255)],
             *self.name_lesson,
-            ['', (255, 255, 255)],
+            '',
             ['Время начала урока:',
              (0, 255, 0) if self.time_start_flag and not self.name_lesson_flag else (255, 255, 255)],
             *self.time_start,
-            ['', (255, 255, 255)],
+            '',
             ['Время окончания урока:',
              (0, 255, 0) if self.time_finish_flag and not self.time_start_flag else (255, 255, 255)],
             *self.time_finish,
-            ['', (255, 255, 255)],
+            '',
             ['Домашнее задание:',
              (0, 255, 0) if self.dz_flag and not self.time_finish_flag else (255, 255, 255)],
             *self.dz
         ]
         for i in range(len(data_print)):
-            if len(data_print[i]) != 0:
-                text_print(message=data_print[i][0],
-                           x=width / self.card_text_crop * (self.card_text_crop - len(data_print[i][0])) / 2,
-                           y=self.card_height / 5 * i,
-                           font_size=self.cards_text_size,
-                           font_color=data_print[i][1]
-                           )
+            color = (255, 255, 255) if type(data_print[i]) == str else data_print[i][1]
+            text = data_print[i] if type(data_print[i]) == str else data_print[i][0]
+            text_print(message=text,
+                       x=width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
+                       y=self.card_height / 5 * i,
+                       font_size=self.cards_text_size,
+                       font_color=color
+                       )
 
     def keyboards_draw(self):
         for y in self.keys:
@@ -265,7 +266,6 @@ class Diary:
                            font_size=self.keyboard_text_size)
 
     def cards_draw(self):
-        print(self.date)
         self.lessons = self.file[self.day]['lessons']
         text = f'{self.file[self.day]["day"]} {self.date}'
         x = (12 / 1000) * width
@@ -302,7 +302,7 @@ class Diary:
             text_print(text,
                        x=width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
                        y=self.cards_y0 + self.card_height * (len(self.lessons)) + self.card_height * (12 / 100) +
-                         self.card_height / 5 * 2,
+                         self.card_height / 5 * 1.5,
                        font_size=self.cards_text_size
                        )
 
@@ -351,21 +351,22 @@ class Diary:
                 print('Задать можно не более 5 учебных дней')
                 quit()
             for day in days:
-                lessons = day.split('/')
-                if len(lessons) > 8:
-                    print('Задать можно не более 8 уроков в день')
-                    quit()
-                for lesson in lessons:
-                    lesson = lesson.split('-')
-                    if len(lesson) > 3:
-                        print('Ошибка в записи урока => (Название начало конец)')
+                if day != '':
+                    lessons = day.split('/')
+                    if len(lessons) > 8:
+                        print('Задать можно не более 8 уроков в день')
                         quit()
-                    self.file[days.index(day)]['lessons'].append(
-                        {"lesson": lesson[0],
-                         "time_start": lesson[1],
-                         "time_finish": lesson[2],
-                         "task": ""}
-                    )
+                    for lesson in lessons:
+                        lesson = lesson.split('-')
+                        if len(lesson) > 3:
+                            print('Ошибка в записи урока => (Название начало конец)')
+                            quit()
+                        self.file[days.index(day)]['lessons'].append(
+                            {"lesson": lesson[0],
+                             "time_start": lesson[1],
+                             "time_finish": lesson[2],
+                             "task": ""}
+                        )
             main.save()
             print('Расписание установлено')
         except:
