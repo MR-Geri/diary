@@ -249,8 +249,7 @@ class Diary:
         for i in range(len(data_print)):
             if len(data_print[i]) != 0:
                 text_print(message=data_print[i][0],
-                           x=(12 / 1000) * width + width / self.card_text_crop * (
-                                   self.card_text_crop - len(data_print[i][0])) / 2,
+                           x=width / self.card_text_crop * (self.card_text_crop - len(data_print[i][0])) / 2,
                            y=self.card_height / 5 * i,
                            font_size=self.cards_text_size,
                            font_color=data_print[i][1]
@@ -270,7 +269,7 @@ class Diary:
         text = f'{self.file[self.day]["day"]} {self.date}'
         x = (12 / 1000) * width
         text_print(message=text,
-                   x=x + width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
+                   x=width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
                    y=0,
                    font_size=self.cards_text_size)
         for i in range(len(self.lessons)):
@@ -282,7 +281,7 @@ class Diary:
                        font_size=self.cards_text_size)
             text = f'{self.lessons[i].get("lesson")}'
             text_print(message=text,
-                       x=x + width * (285 / 1000) +
+                       x=width * (285 / 1000) +
                          int(width * (715 / 1000) / self.card_text_crop * (self.card_text_crop - len(text)) / 2),
                        y=y + self.card_height * (12 / 100),
                        font_size=self.cards_text_size)
@@ -298,7 +297,12 @@ class Diary:
         if len(self.lessons) < 8:
             pygame.draw.rect(display, self.color[len(self.lessons)],
                              (0, self.cards_y0 + self.card_height * len(self.lessons), width, self.card_height))
-            # text_print('Добавить урок', x=)
+            text = 'Добавить урок'
+            text_print(text,
+                       x=width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
+                       y=self.cards_y0 + self.card_height * (len(self.lessons)) + self.card_height * (12 / 100) +
+                         self.card_height / 5 * 2
+                       )
 
     def draw_all(self):
         pygame.draw.rect(display, (43, 43, 43), (0, 0, width, height))
