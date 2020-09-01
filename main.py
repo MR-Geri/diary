@@ -57,7 +57,7 @@ class Diary:
         self.swype = False
         self.swype_pos = ()
         self.date = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
-        self.date += datetime.timedelta(days=self.day)
+
         self.card_click_num = 0
         self.color = [(55, 55, 55) if i % 2 != 0 else (128, 128, 128) for i in range(8)]
         #
@@ -265,6 +265,7 @@ class Diary:
                            font_size=self.keyboard_text_size)
 
     def cards_draw(self):
+        print(self.date)
         self.lessons = self.file[self.day]['lessons']
         text = f'{self.file[self.day]["day"]} {self.date}'
         x = (12 / 1000) * width
@@ -309,6 +310,8 @@ class Diary:
         pygame.draw.rect(display, (43, 43, 43), (0, 0, width, height))
         self.date = datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())
         self.date += datetime.timedelta(days=self.day)
+        if self.date < datetime.date.today():
+            self.date += datetime.timedelta(days=7)
         if self.add_task_flag:
             main.add_task_draw()
         if self.cards_flag:
