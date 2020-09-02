@@ -49,7 +49,6 @@ class Diary:
         self.last_click = 0
         self.text_keyboard = ''
         self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' :       # ']
-        self.lessons = self.file[self.day]['lessons']
         self.cards_flag = True
         self.add_task_flag = False
         self.keyboard_flag = False
@@ -117,15 +116,15 @@ class Diary:
                     main.draw_all()
 
     def card_action(self, pos, click):
-        for i in range(len(self.lessons)):
+        for i in range(len(self.file[self.day]["lessons"])):
             y = self.cards_y0 + self.card_height * i
             if y < pos[1] < y + self.card_height and click == 0 and self.last_click == 1:
                 self.add_task_flag = True
                 self.cards_flag = False
                 self.keyboard_flag = True
                 self.card_click_num = i
-        if len(self.lessons) < 8:
-            y = self.cards_y0 + self.card_height * len(self.lessons)
+        if len(self.file[self.day]["lessons"]) < 8:
+            y = self.cards_y0 + self.card_height * len(self.file[self.day]["lessons"])
             if y < pos[1] < y + self.card_height:
                 #
                 self.name_lesson_flag = True
@@ -194,7 +193,7 @@ class Diary:
         pygame.draw.rect(display, (60, 63, 65), (0, 0, width, height))
         last_dz = []
         new_dz = []
-        task = self.lessons[self.card_click_num]["task"]
+        task = self.file[self.day]["lessons"][self.card_click_num]["task"]
         while len(task) > 0:
             last_dz.append(task[:self.card_text_crop])
             task = task[self.card_text_crop:]
@@ -202,7 +201,8 @@ class Diary:
         while len(text_keyboard) > 0:
             new_dz.append(text_keyboard[:self.card_text_crop])
             text_keyboard = text_keyboard[self.card_text_crop:]
-        data_print = [f'{self.file[self.day]["day"]} {self.date}', f'{self.lessons[self.card_click_num]["lesson"]}',
+        data_print = [f'{self.file[self.day]["day"]} {self.date}',
+                      f'{self.file[self.day]["lessons"][self.card_click_num]["lesson"]}',
                       '', 'Старое домашнее задание:', *last_dz, '', 'Новое домашнее задание:', *new_dz]
         for i in range(len(data_print)):
             text_print(message=data_print[i],
@@ -275,27 +275,28 @@ class Diary:
                            font_size=self.keyboard_text_size)
 
     def cards_draw(self):
-        self.lessons = self.file[self.day]['lessons']
+        self.file[self.day]["lessons"] = self.file[self.day]['lessons']
         text = f'{self.file[self.day]["day"]} {self.date}'
         x = (12 / 1000) * width
         text_print(message=text,
                    x=width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
                    y=0,
                    font_size=self.cards_text_size)
-        for i in range(len(self.lessons)):
+        for i in range(len(self.file[self.day]["lessons"])):
             y = self.cards_y0 + self.card_height * i
             pygame.draw.rect(display, (self.color[i]), (0, y, width, self.card_height))
-            text_print(message=f'{self.lessons[i].get("time_start")}-{self.lessons[i].get("time_finish")}',
+            text_print(message=f'{self.file[self.day]["lessons"][i].get("time_start")}-'
+                               f'{self.file[self.day]["lessons"][i].get("time_finish")}',
                        x=x,
                        y=y + self.card_height * (12 / 100),
                        font_size=self.cards_text_size)
-            text = f'{self.lessons[i].get("lesson")}'
+            text = f'{self.file[self.day]["lessons"][i].get("lesson")}'
             text_print(message=text,
                        x=width * (285 / 1000) +
                          int(width * (715 / 1000) / self.card_text_crop * (self.card_text_crop - len(text)) / 2),
                        y=y + self.card_height * (12 / 100),
                        font_size=self.cards_text_size)
-            task = self.lessons[i].get("task")
+            task = self.file[self.day]["lessons"][i].get("task")
             num = 1
             while len(task) > 0:
                 text_print(message=task[:self.card_text_crop],
@@ -304,14 +305,15 @@ class Diary:
                            font_size=self.cards_text_size)
                 task = task[self.card_text_crop:]
                 num += 1
-        if len(self.lessons) < 8:
-            pygame.draw.rect(display, self.color[len(self.lessons)],
-                             (0, self.cards_y0 + self.card_height * len(self.lessons), width, self.card_height))
+        if len(self.file[self.day]["lessons"]) < 8:
+            pygame.draw.rect(display, self.color[len(self.file[self.day]["lessons"])],
+                             (0, self.cards_y0 + self.card_height * len(self.file[self.day]["lessons"]),
+                              width, self.card_height))
             text = 'Добавить урок'
             text_print(text,
                        x=width / self.card_text_crop * (self.card_text_crop - len(text)) / 2,
-                       y=self.cards_y0 + self.card_height * (len(self.lessons)) + self.card_height * (12 / 100) +
-                         self.card_height / 5 * 1.5,
+                       y=self.cards_y0 + self.card_height * (len(self.file[self.day]["lessons"])) +
+                         self.card_height * (12 / 100) + self.card_height / 5 * 1.5,
                        font_size=self.cards_text_size
                        )
 
