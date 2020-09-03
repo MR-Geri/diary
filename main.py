@@ -1,3 +1,5 @@
+import time
+
 import pygame
 import json
 import datetime
@@ -48,7 +50,7 @@ class Diary:
         #
         self.last_click = 0
         self.text_keyboard = ''
-        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' :       # ']
+        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' :.     -# ']
         self.cards_flag = True
         self.add_task_flag = False
         self.keyboard_flag = False
@@ -125,7 +127,7 @@ class Diary:
                 self.card_click_num = i
         if len(self.file[self.day]["lessons"]) < 8:
             y = self.cards_y0 + self.card_height * len(self.file[self.day]["lessons"])
-            if y < pos[1] < y + self.card_height:
+            if y < pos[1] < y + self.card_height and self.last_click == 1 and click == 0:
                 #
                 self.name_lesson_flag = True
                 self.time_start_flag = True
@@ -171,6 +173,10 @@ class Diary:
                 self.add_task_flag = False
                 self.add_lesson_flag = False
                 self.keyboard_flag = False
+                self.name_lesson_flag = False
+                self.time_start_flag = False
+                self.time_finish_flag = False
+                self.dz_flag = False
             elif pos[0] - self.swype_pos[0] < 0 and\
                     abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
                 self.day += 1
