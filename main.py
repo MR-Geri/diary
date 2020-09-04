@@ -165,7 +165,7 @@ class Diary:
     def action(self):
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
-        if self.time_flag and (datetime.datetime.now() - self.time_click).seconds >= 0.3:
+        if self.time_flag and (datetime.datetime.now() - self.time_click).seconds >= 0.1:
             self.time_click = datetime.datetime.now()
             self.swype = False
             main.draw_all()
