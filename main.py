@@ -49,8 +49,9 @@ class Diary:
         self.day = 0 if now == 5 or now == 6 else now
         #
         self.last_click = 0
+        self.time_click = datetime.datetime.now()
         self.text_keyboard = ''
-        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', 'ячсмитьъбю<', ' :.     -# ']
+        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', ',ячсмитьбю<', ' :.     -# ']
         self.cards_flag = True
         self.add_task_flag = False
         self.keyboard_flag = False
@@ -63,12 +64,12 @@ class Diary:
         self.color = [(55, 55, 55) if i % 2 != 0 else (128, 128, 128) for i in range(8)]
         #
         self.name_lesson_flag = False
-        self.time_start_flag = False
-        self.time_finish_flag = False
+        self.less_start_flag = False
+        self.less_finish_flag = False
         self.dz_flag = False
         self.name_lesson = []
-        self.time_start = []
-        self.time_finish = []
+        self.less_start = []
+        self.less_finish = []
         self.dz = []
         #
         self.keyboard_text_size = int((width + height) / 3320 * 180)
@@ -94,10 +95,10 @@ class Diary:
                         self.last_click = 0
                         if self.name_lesson_flag:
                             self.name_lesson_flag = False
-                        elif self.time_start_flag:
-                            self.time_start_flag = False
-                        elif self.time_finish_flag:
-                            self.time_finish_flag = False
+                        elif self.less_start_flag:
+                            self.less_start_flag = False
+                        elif self.less_finish_flag:
+                            self.less_finish_flag = False
                         elif self.dz_flag:
                             self.dz_flag = False
                         else:
@@ -130,12 +131,12 @@ class Diary:
             if y < pos[1] < y + self.card_height and self.last_click == 1 and click == 0:
                 #
                 self.name_lesson_flag = True
-                self.time_start_flag = True
-                self.time_finish_flag = True
+                self.less_start_flag = True
+                self.less_finish_flag = True
                 self.dz_flag = True
                 self.name_lesson = []
-                self.time_start = []
-                self.time_finish = []
+                self.less_start = []
+                self.less_finish = []
                 self.dz = []
                 #
                 self.add_lesson_flag = True
@@ -143,8 +144,8 @@ class Diary:
                 self.cards_flag = False
 
     def add_lesson_action(self):
-        start = ''.join(self.time_start)
-        finish = ''.join(self.time_finish)
+        start = ''.join(self.less_start)
+        finish = ''.join(self.less_finish)
         try:
             with open('data/time.json') as f:
                 time = json.load(f)
@@ -154,8 +155,8 @@ class Diary:
             pass
         self.file[self.day]['lessons'].append(
             {"lesson": ''.join(self.name_lesson),
-             "time_start": start,
-             "time_finish": finish,
+             "less_start": start,
+             "less_finish": finish,
              "task": ''.join(self.dz)}
         )
         main.save()
@@ -163,10 +164,13 @@ class Diary:
     def action(self):
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
+        if self.last_click == 0 and click == 1:
+            main.draw_all()
         if not self.swype and self.last_click == 0 and click == 1:
             self.swype_pos = pos
             self.swype = True
         elif self.swype and self.last_click == 1 and click == 0:
+            self.time_click = datetime.datetime.now()
             if pos[1] - self.swype_pos[1] < 0 and \
                     abs(pos[1] - self.swype_pos[1]) >= height * (1/6) and (self.add_task_flag or self.add_lesson_flag):
                 self.cards_flag = True
@@ -174,8 +178,8 @@ class Diary:
                 self.add_lesson_flag = False
                 self.keyboard_flag = False
                 self.name_lesson_flag = False
-                self.time_start_flag = False
-                self.time_finish_flag = False
+                self.less_start_flag = False
+                self.less_finish_flag = False
                 self.dz_flag = False
             elif pos[0] - self.swype_pos[0] < 0 and\
                     abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
@@ -193,6 +197,7 @@ class Diary:
                     main.card_action(pos, click)
             self.swype = False
             main.draw_all()
+
         self.last_click = 0 if click == 0 else 1
 
     def add_task_draw(self):
@@ -226,17 +231,17 @@ class Diary:
             while len(text_keyboard) > 0:
                 self.name_lesson.append(text_keyboard[:self.card_text_crop])
                 text_keyboard = text_keyboard[self.card_text_crop:]
-        elif self.time_start_flag:
-            self.time_start = []
+        elif self.less_start_flag:
+            self.less_start = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.time_start.append(text_keyboard[:self.card_text_crop])
+                self.less_start.append(text_keyboard[:self.card_text_crop])
                 text_keyboard = text_keyboard[self.card_text_crop:]
-        elif self.time_finish_flag:
-            self.time_finish = []
+        elif self.less_finish_flag:
+            self.less_finish = []
             text_keyboard = self.text_keyboard
             while len(text_keyboard) > 0:
-                self.time_finish.append(text_keyboard[:self.card_text_crop])
+                self.less_finish.append(text_keyboard[:self.card_text_crop])
                 text_keyboard = text_keyboard[self.card_text_crop:]
         elif self.dz_flag:
             self.dz = []
@@ -250,15 +255,15 @@ class Diary:
             *self.name_lesson,
             '',
             ['Время начала урока:',
-             (0, 255, 0) if self.time_start_flag and not self.name_lesson_flag else (255, 255, 255)],
-            *self.time_start,
+             (0, 255, 0) if self.less_start_flag and not self.name_lesson_flag else (255, 255, 255)],
+            *self.less_start,
             '',
             ['Время окончания урока:',
-             (0, 255, 0) if self.time_finish_flag and not self.time_start_flag else (255, 255, 255)],
-            *self.time_finish,
+             (0, 255, 0) if self.less_finish_flag and not self.less_start_flag else (255, 255, 255)],
+            *self.less_finish,
             '',
             ['Домашнее задание:',
-             (0, 255, 0) if self.dz_flag and not self.time_finish_flag else (255, 255, 255)],
+             (0, 255, 0) if self.dz_flag and not self.less_finish_flag else (255, 255, 255)],
             *self.dz
         ]
         for i in range(len(data_print)):
@@ -291,8 +296,8 @@ class Diary:
         for i in range(len(self.file[self.day]["lessons"])):
             y = self.cards_y0 + self.card_height * i
             pygame.draw.rect(display, (self.color[i]), (0, y, width, self.card_height))
-            text_print(message=f'{self.file[self.day]["lessons"][i].get("time_start")}-'
-                               f'{self.file[self.day]["lessons"][i].get("time_finish")}',
+            text_print(message=f'{self.file[self.day]["lessons"][i].get("less_start")}-'
+                               f'{self.file[self.day]["lessons"][i].get("less_finish")}',
                        x=x,
                        y=y + self.card_height * (12 / 100),
                        font_size=self.cards_text_size)
@@ -380,8 +385,8 @@ class Diary:
                             quit()
                         self.file[days.index(day)]['lessons'].append(
                             {"lesson": lesson[0],
-                             "time_start": lesson[1],
-                             "time_finish": lesson[2],
+                             "less_start": lesson[1],
+                             "less_finish": lesson[2],
                              "task": ""}
                         )
             main.save()
