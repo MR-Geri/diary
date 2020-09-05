@@ -1,5 +1,8 @@
 import time
 
+import vk_api
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
+from vk_api.longpoll import VkLongPoll, VkEventType
 import pygame
 import json
 import datetime
@@ -283,6 +286,7 @@ class Diary:
                        )
 
     def keyboards_draw(self):
+        # pygame.key.start_text_input()
         for y in self.keys:
             for x in range(len(y)):
                 keys_width = width / len(y)
