@@ -1,8 +1,6 @@
 import time
 
-import vk_api
-from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from vk_api.longpoll import VkLongPoll, VkEventType
+
 import pygame
 import json
 import datetime
@@ -55,10 +53,8 @@ class Diary:
         self.time_click = datetime.datetime.now()
         self.time_flag = False
         self.text_keyboard = ''
-        self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', ',ячсмитьбю<', ' :.     -# ']
         self.cards_flag = True
         self.add_task_flag = False
-        self.keyboard_flag = False
         self.add_lesson_flag = False
         self.swype = False
         self.swype_pos = ()
@@ -86,49 +82,13 @@ class Diary:
         self.card_text_crop = int(width / font_type.render('а', True, (255, 255, 255)).get_width())
         self.card_height = int(self.cards_height / 8)
 
-    def keyboard_action(self, pos, click):
-        for y in self.keys:
-            for x in range(len(y)):
-                keys_width = width / len(y)
-                pos_y = self.keyboard_y0 + self.keyboard_height * self.keys.index(y)
-                if keys_width * x < pos[0] < keys_width * x + keys_width\
-                        and pos_y < pos[1] < pos_y + self.keyboard_height and click == 0 and self.last_click == 1:
-                    if y[x] == '<':
-                        self.text_keyboard = self.text_keyboard[:-1]
-                    elif y[x] == '#':
-                        self.last_click = 0
-                        if self.name_lesson_flag:
-                            self.name_lesson_flag = False
-                        elif self.less_start_flag:
-                            self.less_start_flag = False
-                        elif self.less_finish_flag:
-                            self.less_finish_flag = False
-                        elif self.dz_flag:
-                            self.dz_flag = False
-                        else:
-                            if self.add_lesson_flag:
-                                main.add_lesson_action()
-                                self.cards_flag = True
-                                self.add_lesson_flag = False
-                                self.keyboard_flag = False
-                            elif self.add_task_flag:
-                                self.file[self.day]['lessons'][self.card_click_num]["task"] = self.text_keyboard
-                                self.cards_flag = True
-                                self.add_task_flag = False
-                                self.keyboard_flag = False
-                                main.save()
-                        self.text_keyboard = ''
-                    else:
-                        self.text_keyboard += y[x]
-                    main.draw_all()
-
     def card_action(self, pos, click):
         for i in range(len(self.file[self.day]["lessons"])):
             y = self.cards_y0 + self.card_height * i
             if y < pos[1] < y + self.card_height and click == 0 and self.last_click == 1:
                 self.add_task_flag = True
                 self.cards_flag = False
-                self.keyboard_flag = True
+                pygame.key.start_text_input()
                 self.card_click_num = i
         if len(self.file[self.day]["lessons"]) < 8:
             y = self.cards_y0 + self.card_height * len(self.file[self.day]["lessons"])
@@ -144,8 +104,8 @@ class Diary:
                 self.dz = []
                 #
                 self.add_lesson_flag = True
-                self.keyboard_flag = True
                 self.cards_flag = False
+                pygame.key.start_text_input()
 
     def add_lesson_action(self):
         start = ''.join(self.less_start)
@@ -185,11 +145,11 @@ class Diary:
                     self.cards_flag = True
                     self.add_task_flag = False
                     self.add_lesson_flag = False
-                    self.keyboard_flag = False
                     self.name_lesson_flag = False
                     self.less_start_flag = False
                     self.less_finish_flag = False
                     self.dz_flag = False
+                    pygame.key.stop_text_input()
                 elif pos[0] - self.swype_pos[0] < 0 and\
                         abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
                     self.day += 1
@@ -200,8 +160,6 @@ class Diary:
                     self.day -= 1
                     self.day = 4 if self.day == -1 else self.day
                 else:
-                    if self.add_task_flag or self.add_lesson_flag:
-                        main.keyboard_action(pos, click)
                     if self.cards_flag:
                         main.card_action(pos, click)
                 self.swype = False
@@ -285,16 +243,6 @@ class Diary:
                        font_color=color
                        )
 
-    def keyboards_draw(self):
-        # pygame.key.start_text_input()
-        for y in self.keys:
-            for x in range(len(y)):
-                keys_width = width / len(y)
-                text_print(y[x],
-                           x=keys_width * x,
-                           y=self.keyboard_y0 + self.keyboard_height * self.keys.index(y) + self.keyboard_height / 15,
-                           font_size=self.keyboard_text_size)
-
     def cards_draw(self):
         self.file[self.day]["lessons"] = self.file[self.day]['lessons']
         text = f'{self.file[self.day]["day"]} {self.date}'
@@ -350,8 +298,6 @@ class Diary:
             main.cards_draw()
         if self.add_lesson_flag:
             main.add_lesson_draw()
-        if self.keyboard_flag:
-            main.keyboards_draw()
         pygame.display.update()
 
     def set_lesson(self):
@@ -421,6 +367,35 @@ class Diary:
                 if en.type == pygame.QUIT:
                     pygame.quit()
                     quit()
+                elif en.type == pygame.KEYDOWN:
+                    if en.key == pygame.K_RETURN:
+                        self.last_click = 0
+                        if self.name_lesson_flag:
+                            self.name_lesson_flag = False
+                        elif self.less_start_flag:
+                            self.less_start_flag = False
+                        elif self.less_finish_flag:
+                            self.less_finish_flag = False
+                        elif self.dz_flag:
+                            self.dz_flag = False
+                        else:
+                            if self.add_lesson_flag:
+                                main.add_lesson_action()
+                                self.cards_flag = True
+                                self.add_lesson_flag = False
+                                pygame.key.stop_text_input()
+                            elif self.add_task_flag:
+                                self.file[self.day]['lessons'][self.card_click_num]["task"] = self.text_keyboard
+                                self.cards_flag = True
+                                self.add_task_flag = False
+                                pygame.key.stop_text_input()
+                                main.save()
+                        self.text_keyboard = ''
+                    elif en.key == pygame.K_BACKSPACE:
+                        self.text_keyboard = self.text_keyboard[:-1]
+                    else:
+                        self.text_keyboard += en.unicode
+                    main.draw_all()
 
 
 if __name__ == '__main__':
