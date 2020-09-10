@@ -187,11 +187,12 @@ class Diary:
                     abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
                 self.day -= 1
                 self.day = 4 if self.day == -1 else self.day
-            elif (datetime.datetime.now() - self.time_click).microseconds >= 300000:
+            else:
+                if self.cards_flag and (datetime.datetime.now() - self.time_click).microseconds >= 300000:
+                    main.card_action(pos, click)
                 if self.add_task_flag or self.add_lesson_flag:
                     main.keyboard_action(pos, click)
-                if self.cards_flag:
-                    main.card_action(pos, click)
+
             self.swype = False
             main.draw_all()
 
