@@ -166,6 +166,7 @@ class Diary:
             self.time_click = datetime.datetime.now()
             self.swype_pos = pos
             self.swype = True
+            main.draw_all()
         elif self.swype and self.last_click == 1 and click == 0:
             if pos[1] - self.swype_pos[1] < 0 and \
                     abs(pos[1] - self.swype_pos[1]) >= height * (1/6) and (self.add_task_flag or self.add_lesson_flag):
