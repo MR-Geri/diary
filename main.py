@@ -48,7 +48,6 @@ class Diary:
         #
         self.last_click = 0
         self.time_click = datetime.datetime.now()
-        self.time_flag = False
         self.text_keyboard = ''
         self.keys = ['1234567890', 'йцукенгшщзх', 'фывапролджэ', ',ячсмитьбю<', ' :.     -# ']
         self.cards_flag = True
@@ -163,46 +162,39 @@ class Diary:
     def action(self):
         pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
-        if self.time_flag and (datetime.datetime.now() - self.time_click).seconds >= 0.1:
+        if not self.swype and self.last_click == 0 and click == 1:
             self.time_click = datetime.datetime.now()
+            self.swype_pos = pos
+            self.swype = True
+        elif self.swype and self.last_click == 1 and click == 0:
+            if pos[1] - self.swype_pos[1] < 0 and \
+                    abs(pos[1] - self.swype_pos[1]) >= height * (1/6) and (self.add_task_flag or self.add_lesson_flag):
+                self.cards_flag = True
+                self.add_task_flag = False
+                self.add_lesson_flag = False
+                self.keyboard_flag = False
+                self.name_lesson_flag = False
+                self.less_start_flag = False
+                self.less_finish_flag = False
+                self.dz_flag = False
+            elif pos[0] - self.swype_pos[0] < 0 and\
+                    abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
+                self.day += 1
+                self.day = 0 if self.day == 5 else self.day
+                main.draw_all()
+            elif pos[0] - self.swype_pos[0] > 0 and\
+                    abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
+                self.day -= 1
+                self.day = 4 if self.day == -1 else self.day
+            elif (datetime.datetime.now() - self.time_click).microseconds >= 300000:
+                if self.add_task_flag or self.add_lesson_flag:
+                    main.keyboard_action(pos, click)
+                if self.cards_flag:
+                    main.card_action(pos, click)
             self.swype = False
             main.draw_all()
-        else:
-            if not self.swype and self.last_click == 0 and click == 1:
-                self.time_click = datetime.datetime.now()
-                self.time_flag = True
-                self.swype_pos = pos
-                self.swype = True
-            elif self.swype and self.last_click == 1 and click == 0:
-                self.time_flag = False
-                if pos[1] - self.swype_pos[1] < 0 and \
-                        abs(pos[1] - self.swype_pos[1]) >= height * (1/6) and (self.add_task_flag or self.add_lesson_flag):
-                    self.cards_flag = True
-                    self.add_task_flag = False
-                    self.add_lesson_flag = False
-                    self.keyboard_flag = False
-                    self.name_lesson_flag = False
-                    self.less_start_flag = False
-                    self.less_finish_flag = False
-                    self.dz_flag = False
-                elif pos[0] - self.swype_pos[0] < 0 and\
-                        abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
-                    self.day += 1
-                    self.day = 0 if self.day == 5 else self.day
-                    main.draw_all()
-                elif pos[0] - self.swype_pos[0] > 0 and\
-                        abs(pos[0] - self.swype_pos[0]) >= width * (1/4) and self.cards_flag:
-                    self.day -= 1
-                    self.day = 4 if self.day == -1 else self.day
-                else:
-                    if self.add_task_flag or self.add_lesson_flag:
-                        main.keyboard_action(pos, click)
-                    if self.cards_flag:
-                        main.card_action(pos, click)
-                self.swype = False
-                main.draw_all()
 
-            self.last_click = 0 if click == 0 else 1
+        self.last_click = 0 if click == 0 else 1
 
     def add_task_draw(self):
         pygame.draw.rect(display, (60, 63, 65), (0, 0, width, height))
