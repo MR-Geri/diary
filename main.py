@@ -209,7 +209,7 @@ class Diary:
                 text += f'{t} '
             else:
                 last_dz.append(text)
-                text = t
+                text = f'{t} '
         last_dz.append(text)
         text_keyboard = self.text_keyboard.split()
         text = ''
@@ -218,7 +218,7 @@ class Diary:
                 text += f'{t} '
             else:
                 new_dz.append(text)
-                text = t
+                text = f'{t} '
         new_dz.append(text)
         data_print = [f'{self.file[self.day]["day"]} {self.date}',
                       f'{self.file[self.day]["lessons"][self.card_click_num]["lesson"]}',
@@ -323,7 +323,7 @@ class Diary:
                     text += f'{t} '
                 else:
                     task_.append(text)
-                    text = t
+                    text = f'{t} '
             task_.append(text)
             for ind in range(len(task_)):
                 text_print(message=task_[ind],
