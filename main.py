@@ -202,14 +202,24 @@ class Diary:
         pygame.draw.rect(display, (60, 63, 65), (0, 0, width, height))
         last_dz = []
         new_dz = []
-        task = self.file[self.day]["lessons"][self.card_click_num]["task"]
-        while len(task) > 0:
-            last_dz.append(task[:self.card_text_crop])
-            task = task[self.card_text_crop:]
-        text_keyboard = self.text_keyboard
-        while len(text_keyboard) > 0:
-            new_dz.append(text_keyboard[:self.card_text_crop])
-            text_keyboard = text_keyboard[self.card_text_crop:]
+        task = self.file[self.day]["lessons"][self.card_click_num]["task"].split()
+        text = ''
+        for t in task:
+            if len(text) + len(t) <= self.card_text_crop:
+                text += f' {t}'
+            else:
+                last_dz.append(text)
+                text = t
+        last_dz.append(text)
+        text_keyboard = self.text_keyboard.split()
+        text = ''
+        for t in text_keyboard:
+            if len(text) + len(t) <= self.card_text_crop:
+                text += f'{t} '
+            else:
+                new_dz.append(text)
+                text = t
+        new_dz.append(text)
         data_print = [f'{self.file[self.day]["day"]} {self.date}',
                       f'{self.file[self.day]["lessons"][self.card_click_num]["lesson"]}',
                       '', 'Старое домашнее задание:', *last_dz, '', 'Новое домашнее задание:', *new_dz]
