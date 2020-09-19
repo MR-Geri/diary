@@ -206,7 +206,7 @@ class Diary:
         text = ''
         for t in task:
             if len(text) + len(t) <= self.card_text_crop:
-                text += f' {t}'
+                text += f'{t} '
             else:
                 last_dz.append(text)
                 text = t
@@ -315,15 +315,21 @@ class Diary:
                          int(width * (715 / 1000) / self.card_text_crop * (self.card_text_crop - len(text)) / 2),
                        y=y + self.card_height * (12 / 100),
                        font_size=self.cards_text_size)
-            task = self.file[self.day]["lessons"][i].get("task")
-            num = 1
-            while len(task) > 0:
-                text_print(message=task[:self.card_text_crop],
+            task = self.file[self.day]["lessons"][i].get("task").split()
+            text = ''
+            task_ = []
+            for t in task:
+                if len(text) + len(t) <= self.card_text_crop:
+                    text += f'{t} '
+                else:
+                    task_.append(text)
+                    text = t
+            task_.append(text)
+            for ind in range(len(task_)):
+                text_print(message=task_[ind],
                            x=x,
-                           y=y + self.card_height * (12 / 100) + self.card_height / 5 * num,
+                           y=y + self.card_height * (12 / 100) + self.card_height / 5 * (1 + ind),
                            font_size=self.cards_text_size)
-                task = task[self.card_text_crop:]
-                num += 1
         if len(self.file[self.day]["lessons"]) < 8:
             pygame.draw.rect(display, self.color[len(self.file[self.day]["lessons"])],
                              (0, self.cards_y0 + self.card_height * len(self.file[self.day]["lessons"]),
