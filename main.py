@@ -11,6 +11,8 @@ from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 
 Window.size = (1080 // 2, 2240 // 2)
+# path = 'data'
+path = '/storage/emulated/0/'
 
 
 class Container(BoxLayout):
@@ -40,7 +42,7 @@ class MyTextInput(TextInput):
 class DiaryApp(App):
     def __init__(self):
         super(DiaryApp, self).__init__()
-        with open('data/data.json', encoding='utf-8') as file:
+        with open(f'{path}/data.json', encoding='utf-8') as file:
             self.data = json.load(file)
         now = datetime.datetime.weekday(datetime.datetime.now())
         self.day = 0 if now == 5 or now == 6 else now
@@ -51,7 +53,7 @@ class DiaryApp(App):
 
     def save(self, instance, value):
         self.data[instance.day]['lessons'][instance.lesson]['task'] = value
-        with open('data/data.json', 'w') as f:
+        with open(f'{path}/data.json', 'w') as f:
             json.dump(self.data, f, indent=2)
 
     def build(self):
