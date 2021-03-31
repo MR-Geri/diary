@@ -13,6 +13,7 @@ from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 
 Window.size = (1080, 2240)
+Window.softinput_mode = 'below_target'
 
 
 class Container(BoxLayout):
@@ -50,7 +51,7 @@ class ScreenTextEdit(Screen):
         self.data = data
         self.day = 0
         self.lesson = 0
-        layout = BoxLayout(size_hint=(1, 0.6), pos_hint={'top': 1}, orientation='vertical')
+        layout = BoxLayout(size_hint=(1, 0.6), pos_hint={'top': 1}, orientation='vertical', padding=[20, 20, 20, 0])
         self.text = TextInput(
             foreground_color=(1, 1, 1, 1),
             background_color=(0.5, 0.5, 0.5, 1),
