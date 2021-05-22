@@ -12,8 +12,8 @@ from kivy.core.window import Window
 from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 
-Window.size = (1080 // 2, 2240 // 2)
-Window.softinput_mode = 'below_target'  # 'pan'
+Window.size = (1080, 2240)
+Window.softinput_mode = 'pan'  # 'below_target'
 
 
 class Container(BoxLayout):
