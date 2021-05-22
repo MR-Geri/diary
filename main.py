@@ -12,8 +12,8 @@ from kivy.core.window import Window
 from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 
-Window.size = (1080, 2240)
-Window.softinput_mode = 'below_target'
+Window.size = (1080 // 2, 2240 // 2)
+# Window.softinput_mode = 'below_target'
 
 
 class Container(BoxLayout):
@@ -30,6 +30,9 @@ class MyLabel(Label):
         with self.canvas.before:
             Color(*self.bg_color)
             Rectangle(pos=self.pos, size=self.size)
+
+    def on_press(self, *args, **kwargs):
+        print('удержание')
 
 
 class MyButton(Button):
@@ -139,7 +142,7 @@ class DiaryApp(App):
                              {'lesson': 'общество', 'less_start': '8:50', 'less_finish': '9:30', 'task': ''},
                              {'lesson': 'математика', 'less_start': '9:50', 'less_finish': '10:30',
                               'task': '6.21-6.24'},
-                             {'lesson': 'физкулътура', 'less_start': '10:50', 'less_finish': '11:30',
+                             {'lesson': 'физкультура', 'less_start': '10:50', 'less_finish': '11:30',
                               'task': ''},
                              {'lesson': 'физика', 'less_start': '11:45', 'less_finish': '12:25', 'task': ''},
                              {'lesson': 'икт', 'less_start': '12:40', 'less_finish': '13:20', 'task': ''},
