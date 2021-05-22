@@ -49,6 +49,9 @@ class TitleButton(Button):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def on_touch_down(self, touch):
+        print(1)
+
 
 class ScreenTextEdit(Screen):
     def __init__(self, data, **kwargs):
