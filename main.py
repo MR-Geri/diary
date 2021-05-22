@@ -13,7 +13,7 @@ from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 
 Window.size = (1080 // 2, 2240 // 2)
-# Window.softinput_mode = 'below_target'
+Window.softinput_mode = 'below_target'  # 'pan'
 
 
 class Container(BoxLayout):
@@ -30,9 +30,6 @@ class MyLabel(Label):
         with self.canvas.before:
             Color(*self.bg_color)
             Rectangle(pos=self.pos, size=self.size)
-
-    def on_press(self, *args, **kwargs):
-        print('удержание')
 
 
 class MyButton(Button):
