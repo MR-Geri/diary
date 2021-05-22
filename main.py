@@ -12,7 +12,7 @@ from kivy.core.window import Window
 from kivy.uix.carousel import Carousel
 from kivy.uix.textinput import TextInput
 
-Window.size = (1080, 2240)
+Window.size = (1080 // 2, 2240 // 2)
 Window.softinput_mode = 'below_target'  # 'pan'
 
 
@@ -31,6 +31,9 @@ class MyLabel(Label):
             Color(*self.bg_color)
             Rectangle(pos=self.pos, size=self.size)
 
+    def on_touch_down(self, touch):
+        print(1)
+
 
 class LessonButton(Button):
     def __init__(self, day: int, lesson: int, **kwargs):
@@ -43,14 +46,6 @@ class LessonButton(Button):
         app.text_edit.lesson = self.lesson
         app.text_edit.upd()
         app.main_screen.manager.current = 'text_edit'
-
-
-class TitleButton(Button):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def on_touch_down(self, touch):
-        print(1)
 
 
 class ScreenTextEdit(Screen):
