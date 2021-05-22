@@ -32,7 +32,7 @@ class MyLabel(Label):
             Rectangle(pos=self.pos, size=self.size)
 
 
-class MyButton(Button):
+class LessonButton(Button):
     def __init__(self, day: int, lesson: int, **kwargs):
         super().__init__(**kwargs)
         self.day = day
@@ -43,6 +43,11 @@ class MyButton(Button):
         app.text_edit.lesson = self.lesson
         app.text_edit.upd()
         app.main_screen.manager.current = 'text_edit'
+
+
+class TitleButton(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class ScreenTextEdit(Screen):
@@ -108,7 +113,7 @@ class ScreenMain(Screen):
                 title.add_widget(MyLabel(text=f'{lesson["lesson"]}', bg_color=color))
                 title.add_widget(MyLabel(text=f'{lesson["less_start"]}-{lesson["less_finish"]}', bg_color=color))
                 card.add_widget(title)
-                btn = MyButton(background_color=color, text=f'{lesson["task"]}', day=i, lesson=j)
+                btn = LessonButton(background_color=color, text=f'{lesson["task"]}', day=i, lesson=j)
                 temp.append(btn)
                 card.add_widget(btn)
                 day_layout.add_widget(card)
